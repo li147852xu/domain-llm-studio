@@ -1,0 +1,8 @@
+{
+  "original": 400,
+  "after_cleaning": 400,
+  "after_dedup": 400,
+  "removed_by_cleaning": 0,
+  "removed_by_dedup": 0,
+  "retention_rate": 1.0
+}

@@ -1,0 +1,23 @@
+base_model: "Qwen/Qwen2.5-7B-Instruct"
+adapter_type: "lora"
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: null
+  bias: "none"
+  task_type: "CAUSAL_LM"
+data_dir: "data/processed"
+output_dir: "experiments/train/lora_7b"
+learning_rate: 1.0e-4
+num_epochs: 3
+per_device_batch_size: 2
+gradient_accumulation_steps: 8
+warmup_ratio: 0.05
+max_seq_length: 2048
+eval_steps: 50
+save_steps: 200
+logging_steps: 10
+bf16: true
+seed: 42
+device_map: "auto"

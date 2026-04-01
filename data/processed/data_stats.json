@@ -1,0 +1,47 @@
+{
+  "total": 400,
+  "by_task": {
+    "event_extraction": 100,
+    "fin_summary": 100,
+    "doc_qa": 100,
+    "analysis_gen": 100
+  },
+  "by_lang": {
+    "zh": 200,
+    "en": 200
+  },
+  "avg_input_len": 218.835,
+  "avg_output_len": 197.7725,
+  "max_input_len": 592,
+  "max_output_len": 538,
+  "task_details": {
+    "analysis_gen": {
+      "count": 100,
+      "avg_input_len": 188.38,
+      "avg_output_len": 227.38,
+      "max_input_len": 216,
+      "max_output_len": 363
+    },
+    "doc_qa": {
+      "count": 100,
+      "avg_input_len": 230.53,
+      "avg_output_len": 64.58,
+      "max_input_len": 377,
+      "max_output_len": 151
+    },
+    "event_extraction": {
+      "count": 100,
+      "avg_input_len": 87.42,
+      "avg_output_len": 145.02,
+      "max_input_len": 180,
+      "max_output_len": 165
+    },
+    "fin_summary": {
+      "count": 100,
+      "avg_input_len": 369.01,
+      "avg_output_len": 354.11,
+      "max_input_len": 592,
+      "max_output_len": 538
+    }
+  }
+}

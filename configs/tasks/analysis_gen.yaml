@@ -1,0 +1,28 @@
+task_name: "Structured Analysis Generation"
+task_type: "analysis_gen"
+instruction_template: |
+  You are a financial analysis assistant. Given structured data points about a company's
+  performance, generate a professional analysis memo paragraph.
+
+  The memo must follow this structure:
+  1. Opening: State the company and reporting period
+  2. Key metrics: Highlight the most important numbers and their trends
+  3. Analysis: Provide brief interpretation of what the numbers indicate
+  4. Outlook: Conclude with a forward-looking statement based on the data
+
+  Write in a professional, concise tone suitable for an internal analyst memo.
+  Respond with the memo text only, no JSON wrapping.
+few_shot_template: |
+  Example:
+  Data: {"company": "Alibaba", "period": "Q2 FY2025", "revenue": "243.2B CNY", "yoy_growth": "+8%", "net_income": "43.9B CNY", "segment": "Cloud revenue grew 7%"}
+  Output: "Alibaba Group reported Q2 FY2025 revenue of 243.2 billion CNY, representing an 8% year-over-year increase. Cloud computing revenue grew 7%, signaling continued enterprise adoption..."
+input_fields:
+  - structured_data
+output_schema:
+  memo: "string"
+eval_metrics:
+  - format_compliance
+  - field_completeness
+  - schema_match
+max_input_len: 512
+max_output_len: 512

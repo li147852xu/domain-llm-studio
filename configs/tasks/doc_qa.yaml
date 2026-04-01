@@ -1,0 +1,30 @@
+task_name: "Document QA"
+task_type: "doc_qa"
+instruction_template: |
+  You are a document question-answering assistant. Given a context document and a question,
+  answer the question based STRICTLY on the provided context.
+  Respond in JSON format with:
+  - answer: your answer to the question
+  - evidence_span: the exact text span from the context that supports your answer
+
+  If the answer cannot be found in the context, respond with:
+  {"answer": "unanswerable", "evidence_span": null}
+
+  Respond ONLY with valid JSON. Do not include any text outside the JSON object.
+few_shot_template: |
+  Example:
+  Context: "Tesla delivered 435,000 vehicles in Q3 2024, a 6% increase from Q2..."
+  Question: "How many vehicles did Tesla deliver in Q3 2024?"
+  Output: {"answer": "435,000 vehicles", "evidence_span": "Tesla delivered 435,000 vehicles in Q3 2024"}
+input_fields:
+  - context
+  - question
+output_schema:
+  answer: "string"
+  evidence_span: "string|null"
+eval_metrics:
+  - exact_match
+  - token_f1
+  - grounding_rate
+max_input_len: 1024
+max_output_len: 256

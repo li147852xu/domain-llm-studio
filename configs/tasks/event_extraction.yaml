@@ -1,0 +1,36 @@
+task_name: "Event & Entity Extraction"
+task_type: "event_extraction"
+instruction_template: |
+  You are an information extraction assistant specializing in financial and corporate events.
+  Given the following text, extract all events and entities into a JSON array.
+  Each event object must contain:
+  - company: the company name involved
+  - event_type: one of [earnings, acquisition, partnership, layoff, product_launch, regulatory, funding, leadership_change, other]
+  - date: the event date if mentioned (ISO format or descriptive), or null
+  - metric: the key metric mentioned (e.g., revenue, profit, headcount), or null
+  - change_direction: one of [increase, decrease, neutral, null]
+  - sentiment: one of [positive, negative, neutral]
+
+  Respond ONLY with a valid JSON array. Do not include any text outside the JSON.
+few_shot_template: |
+  Example:
+  Text: "Microsoft announced on Jan 15 that it will acquire Activision for $69 billion..."
+  Output: [{"company": "Microsoft", "event_type": "acquisition", "date": "2024-01-15", "metric": "deal_value", "change_direction": null, "sentiment": "neutral"}]
+input_fields:
+  - text
+output_schema:
+  type: "array"
+  items:
+    company: "string"
+    event_type: "string"
+    date: "string|null"
+    metric: "string|null"
+    change_direction: "string|null"
+    sentiment: "string"
+eval_metrics:
+  - entity_precision
+  - entity_recall
+  - entity_f1
+  - event_exact_match_f1
+max_input_len: 1024
+max_output_len: 512
