@@ -71,5 +71,5 @@ class TrainingSummaryCallback(TrainerCallback):
         }
         summary_path = self.output_dir / "training_summary.json"
         with open(summary_path, "w") as f:
-            json.dump(summary, f, indent=2)
+            json.dump(summary, f, indent=2, default=str)
         logger.info("Training summary saved to %s", summary_path)
