@@ -53,7 +53,7 @@ def load_base_model(
 
     kwargs: dict = {
         "trust_remote_code": True,
-        "torch_dtype": dtype,
+        "dtype": dtype,
     }
 
     if quantize_4bit:
