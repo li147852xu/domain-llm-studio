@@ -93,7 +93,7 @@ uv sync
 uv run python scripts/download_model.py --model Qwen/Qwen2.5-1.5B-Instruct
 ```
 
-### End-to-End Pipeline
+### End-to-End Pipeline (1.5B Local)
 
 ```bash
 # 1. Build instruction-tuning dataset (bilingual, 400 samples)
@@ -102,20 +102,21 @@ uv run domain-llm-studio build-data --num-samples 50
 # 2. Inspect dataset statistics
 uv run domain-llm-studio inspect-data
 
-# 3. Train LoRA adapter (local: 1.5B model on MPS/CPU)
+# 3. Train LoRA adapter (1.5B model on MPS/CPU)
 uv run domain-llm-studio train --config configs/training/lora_1.5b_local.yaml
 
-# 4. Run evaluation
-uv run domain-llm-studio eval --config configs/eval/default.yaml
+# 4. Evaluate base model + tuned model
+uv run domain-llm-studio eval --config configs/eval/base_1.5b.yaml
+uv run domain-llm-studio eval --config configs/eval/tuned_1.5b.yaml
 
 # 5. Generate comparison report
-uv run domain-llm-studio compare
+uv run domain-llm-studio compare --config configs/eval/base_1.5b.yaml --output experiments/comparison_1.5b
 
 # 6. Launch web demo
-uv run domain-llm-studio web
+uv run domain-llm-studio web --adapter-path experiments/train/lora_1.5b/adapter
 
 # 7. Launch API server
-uv run domain-llm-studio serve
+uv run domain-llm-studio serve --adapter-path experiments/train/lora_1.5b/adapter
 ```
 
 ## Data Pipeline
@@ -165,36 +166,38 @@ uv run domain-llm-studio inspect-data --data-dir data/processed
 - Device auto-detection: CUDA > MPS > CPU
 
 ```bash
-# Local training (Apple Silicon)
+# === 1.5B Local (Apple Silicon / CPU) ===
 uv run domain-llm-studio train --config configs/training/lora_1.5b_local.yaml
 
-# Cloud training (NVIDIA GPU)
+# === 7B Cloud (NVIDIA GPU) ===
 uv run domain-llm-studio train --config configs/training/lora_7b_cloud.yaml
 
-# QLoRA (4-bit, CUDA only)
+# === 7B QLoRA (4-bit, CUDA only) ===
 uv run domain-llm-studio train --config configs/training/qlora_7b_cloud.yaml
 ```
 
-### Cloud Training & Artifact Transfer
-
-Model weights (`.safetensors`) are gitignored to keep the repo lightweight. To train on cloud and bring results back locally:
+### Cloud Workflow (7B on NVIDIA GPU)
 
 ```bash
-# === On cloud machine (A100/4090) ===
-git clone <your-repo-url> && cd domain-llm-studio
+git clone https://github.com/li147852xu/domain-llm-studio.git && cd domain-llm-studio
 uv sync
+
+# Build data + Train + Evaluate (zero config edits needed)
 uv run domain-llm-studio build-data --num-samples 50
 uv run domain-llm-studio train --config configs/training/lora_7b_cloud.yaml
-uv run domain-llm-studio eval --config configs/eval/tuned.yaml
+uv run domain-llm-studio eval --config configs/eval/base_7b.yaml
+uv run domain-llm-studio eval --config configs/eval/tuned_7b.yaml
+uv run domain-llm-studio compare --config configs/eval/base_7b.yaml --output experiments/comparison_7b
+```
 
-# Package adapter + results (lightweight, ~200-400MB)
-bash scripts/transfer_results.sh pack lora_7b
+After training completes, download these files to your local machine:
 
-# === Transfer to local machine ===
-scp cloud:/path/to/domain-llm-studio/lora_7b_results.tar.gz .
-
-# === On local machine ===
-bash scripts/transfer_results.sh unpack lora_7b_results.tar.gz
+```
+experiments/train/lora_7b/adapter/           # LoRA weights (~200-400MB)
+experiments/train/lora_7b/training_log.json  # Training curve
+experiments/train/lora_7b/training_summary.json
+experiments/eval_7b/                         # Eval result JSONs
+experiments/comparison_7b/                   # Comparison report
 ```
 
 ## Evaluation System
@@ -271,17 +274,15 @@ The system classifies prediction failures into actionable categories:
 ### Comparison Reports
 
 ```bash
-# Run evaluation with base model
-uv run domain-llm-studio eval --config configs/eval/default.yaml
+# --- 1.5B model ---
+uv run domain-llm-studio eval --config configs/eval/base_1.5b.yaml
+uv run domain-llm-studio eval --config configs/eval/tuned_1.5b.yaml
+uv run domain-llm-studio compare --config configs/eval/base_1.5b.yaml --output experiments/comparison_1.5b
 
-# Run evaluation with tuned model
-uv run domain-llm-studio eval --config configs/eval/tuned.yaml
-
-# Generate side-by-side comparison report
-uv run domain-llm-studio compare
-
-# View latest results
-uv run domain-llm-studio inspect-results
+# --- 7B model ---
+uv run domain-llm-studio eval --config configs/eval/base_7b.yaml
+uv run domain-llm-studio eval --config configs/eval/tuned_7b.yaml
+uv run domain-llm-studio compare --config configs/eval/base_7b.yaml --output experiments/comparison_7b
 ```
 
 Reports include per-task metric tables, delta columns, error distribution charts, and failure examples.
@@ -321,7 +322,7 @@ domain-llm-studio/
 ├── configs/
 │   ├── tasks/                          # Per-task YAML configs
 │   ├── training/                       # Training profiles (1.5B local, 7B cloud, QLoRA)
-│   └── eval/                           # Evaluation configs
+│   └── eval/                           # Eval configs per model size (base_1.5b, tuned_7b, etc.)
 ├── data/
 │   ├── seed/                           # Generated seed data (committed)
 │   └── processed/                      # Cleaned instruction data (train/dev/test JSONL)
@@ -354,7 +355,13 @@ domain-llm-studio/
 ├── tests/                              # 31 tests covering data, metrics, inference
 ├── scripts/
 │   └── download_model.py              # Model download utility
-└── experiments/                        # Training outputs, eval results (gitignored)
+└── experiments/                        # Per-model results (weights gitignored, JSONs committed)
+    ├── train/lora_1.5b/               # 1.5B training artifacts
+    ├── train/lora_7b/                 # 7B training artifacts
+    ├── eval_1.5b/                     # 1.5B eval results (eval_base.json, eval_tuned.json)
+    ├── eval_7b/                       # 7B eval results
+    ├── comparison_1.5b/               # 1.5B comparison report
+    └── comparison_7b/                 # 7B comparison report
 ```
 
 ## Tech Stack

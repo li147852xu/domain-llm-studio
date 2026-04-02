@@ -1,7 +1,7 @@
 model_path: "Qwen/Qwen2.5-1.5B-Instruct"
-adapter_path: "experiments/train/lora_1.5b/adapter"
+adapter_path: null
 data_dir: "data/processed"
-output_dir: "experiments/eval"
+output_dir: "experiments/eval_1.5b"
 tasks:
   - "fin_summary"
   - "event_extraction"
@@ -9,8 +9,4 @@ tasks:
   - "analysis_gen"
 num_samples: null
 batch_size: 1
-compare_models:
-  - "base"
-  - "prompt_only"
-  - "tuned"
 seed: 42
