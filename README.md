@@ -150,7 +150,23 @@ uv run domain-llm-studio inspect-data --data-dir data/processed
 | Variant | Model | Use Case |
 |---------|-------|----------|
 | Local dev | `Qwen/Qwen2.5-1.5B-Instruct` | M4 Mac, MPS, rapid iteration |
-| Cloud | `Qwen/Qwen2.5-7B-Instruct` | A100/4090, production quality |
+| Cloud | `Qwen/Qwen2.5-7B-Instruct` | RTX 5090, production quality |
+
+### Training Results
+
+Both models were trained for 3 epochs with LoRA (r=16, α=32) on the same 320-sample instruction dataset:
+
+| | Qwen2.5-1.5B | Qwen2.5-7B |
+|---|---|---|
+| **Device** | Apple M4 MPS | RTX 5090 CUDA |
+| **Training time** | 25 min | **2 min** |
+| **Trainable params** | 18.5M (1.18%) | 40.4M (0.53%) |
+| **Final train loss** | 0.207 | 0.273 |
+| **Final eval loss** | 0.208 | 0.267 |
+| **Token accuracy** | 93.2% | 92.0% |
+| **Learning rate** | 2e-4 | 1e-4 |
+
+> Loss curve (7B): 2.114 → 1.144 → 0.641 → 0.382 → 0.306 → 0.273. No overfitting observed.
 
 ### Three Experiment Modes
 
