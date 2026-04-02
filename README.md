@@ -150,23 +150,7 @@ uv run domain-llm-studio inspect-data --data-dir data/processed
 | Variant | Model | Use Case |
 |---------|-------|----------|
 | Local dev | `Qwen/Qwen2.5-1.5B-Instruct` | M4 Mac, MPS, rapid iteration |
-| Cloud | `Qwen/Qwen2.5-7B-Instruct` | RTX 5090, production quality |
-
-### Training Results
-
-Both models were trained for 3 epochs with LoRA (r=16, α=32) on the same 320-sample instruction dataset:
-
-| | Qwen2.5-1.5B | Qwen2.5-7B |
-|---|---|---|
-| **Device** | Apple M4 MPS | RTX 5090 CUDA |
-| **Training time** | 25 min | **2 min** |
-| **Trainable params** | 18.5M (1.18%) | 40.4M (0.53%) |
-| **Final train loss** | 0.207 | 0.273 |
-| **Final eval loss** | 0.208 | 0.267 |
-| **Token accuracy** | 93.2% | 92.0% |
-| **Learning rate** | 2e-4 | 1e-4 |
-
-> Loss curve (7B): 2.114 → 1.144 → 0.641 → 0.382 → 0.306 → 0.273. No overfitting observed.
+| Cloud | `Qwen/Qwen2.5-7B-Instruct` | A100/4090, production quality |
 
 ### Three Experiment Modes
 
@@ -286,6 +270,67 @@ The system classifies prediction failures into actionable categories:
 | Hallucination | 0 | 5 |
 
 > Training: 3 epochs, 60 steps, 25 min on Apple M4 MPS. LoRA r=16/α=32, 18.5M trainable params (1.18% of 1.56B). Train loss converged from 1.878 → 0.207 with no overfitting (eval loss 0.208).
+
+### Results: Base vs LoRA-Tuned (Qwen2.5-7B, 3 epochs, RTX 5090 CUDA)
+
+**Financial Summarization** — massive improvement:
+
+| Metric | Base | LoRA-Tuned | Delta |
+|--------|------|------------|-------|
+| ROUGE-1 | 0.706 | **0.916** | +0.210 |
+| ROUGE-2 | 0.507 | **0.898** | **+0.392** |
+| ROUGE-L | 0.633 | **0.916** | +0.283 |
+| Keypoint Coverage | 0.650 | **0.795** | +0.145 |
+
+**Event Extraction** — remains challenging at both scales:
+
+| Metric | Base | LoRA-Tuned | Delta |
+|--------|------|------------|-------|
+| Entity F1 | 0.000 | 0.000 | — |
+| Event F1 | 0.000 | 0.000 | — |
+
+**Document QA** — reached perfect score:
+
+| Metric | Base | LoRA-Tuned | Delta |
+|--------|------|------------|-------|
+| Exact Match | 0.900 | **1.000** | +0.100 |
+| Token F1 | 0.975 | **1.000** | +0.025 |
+| Grounding Rate | 1.000 | 1.000 | — |
+
+**Structured Analysis** — all metrics perfect after tuning:
+
+| Metric | Base | LoRA-Tuned | Delta |
+|--------|------|------------|-------|
+| Format Compliance | 1.000 | 1.000 | — |
+| Field Completeness | 0.833 | **1.000** | +0.167 |
+| Schema Match | 0.917 | **1.000** | +0.083 |
+
+**Error Analysis** — error rate dropped from 100% to 62.5%:
+
+| | Base | LoRA-Tuned |
+|---|------|------------|
+| Error Rate | 100% | **62.5%** |
+| Partial Match | 35 | 20 |
+| Hallucination | 5 | 4 |
+| Format Violation | 0 | 1 |
+
+> Training: 3 epochs, 60 steps, **2 min** on RTX 5090 CUDA (bf16). LoRA r=16/α=32, 40.4M trainable params (0.53% of 7.66B). Train loss converged from 2.114 → 0.273 with no overfitting (eval loss 0.267).
+
+### Cross-Model Comparison
+
+| Task | Metric | 1.5B Base | 1.5B Tuned | 7B Base | 7B Tuned |
+|------|--------|-----------|------------|---------|----------|
+| fin_summary | ROUGE-2 | 0.475 | 0.902 | 0.507 | **0.898** |
+| event_extraction | Entity F1 | 0.000 | **0.200** | 0.000 | 0.000 |
+| doc_qa | Exact Match | 0.900 | **1.000** | 0.900 | **1.000** |
+| analysis_gen | Field Completeness | 0.400 | **1.000** | 0.833 | **1.000** |
+| — | Error Rate | 100% | **57.5%** | 100% | 62.5% |
+
+**Key observations:**
+- **7B base is stronger out-of-the-box**: higher field completeness (0.83 vs 0.40), higher ROUGE, fewer format violations
+- **Both models benefit significantly from LoRA tuning**: doc_qa and analysis_gen reach perfect scores at both scales
+- **Event extraction remains the hardest task**: structured JSON extraction with strict schema matching is challenging even for the 7B model — this is a realistic finding that motivates further work (more training data, schema-constrained decoding)
+- **Training speed**: 7B on RTX 5090 (2 min) vs 1.5B on M4 MPS (25 min) — GPU advantage is ~12x
 
 ### Comparison Reports
 

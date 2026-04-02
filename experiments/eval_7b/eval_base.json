@@ -1,0 +1,132 @@
+{
+  "model": "base",
+  "model_path": "models/Qwen2.5-7B-Instruct",
+  "adapter_path": null,
+  "per_task": {
+    "analysis_gen": {
+      "format_compliance": 1.0,
+      "field_completeness": 0.8333333333333334,
+      "schema_match": 0.9166666666666666
+    },
+    "doc_qa": {
+      "exact_match": 0.9,
+      "token_f1": 0.975,
+      "grounding_rate": 1.0
+    },
+    "event_extraction": {
+      "entity_precision": 0.0,
+      "entity_recall": 0.0,
+      "entity_f1": 0.0,
+      "event_precision": 0.0,
+      "event_recall": 0.0,
+      "event_f1": 0.0,
+      "parse_failure_rate": 0.0
+    },
+    "fin_summary": {
+      "rouge1": 0.7060558129916498,
+      "rouge2": 0.5066156392266525,
+      "rougeL": 0.6328009365247137,
+      "keypoint_coverage": 0.6498515198759185
+    }
+  },
+  "error_analysis": {
+    "error_distribution": {
+      "partial_match": 35,
+      "hallucination": 5
+    },
+    "total_errors": 40,
+    "total_samples": 40,
+    "error_rate": 1.0,
+    "examples": {
+      "partial_match": [
+        {
+          "sample_id": 0,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"中国移动\", \"period\": \"2023年Q2季度\", \"revenue\": \"3963.3亿元\", \"yoy_growth\": \"+19.9%\", \"net_income\": \"2525.9亿元\", \"margin\": \"23.5%\", \"segment_highlight\": \"企业服务部门扩张32.8%\"}",
+          "prediction": "在中国移动2023年第二季度的财务报告中，公司实现了总收入3963.3亿元，同比增长19.9%，净利润达到2525.9亿元，毛利率为23.5%。其中，企业服务部门收入增长尤为显著，扩张了32.8%。这些数据表明，中国移动在保持稳健增长的同时，通过优化业务结构进一步提升了盈利能力。展望未来，随着5G技术的深入应用和数字化转型的加速推进，预计中国移动将继续保持强劲的增长势头，并有望进一步扩大市场份额。",
+          "reference": "中国移动2023年Q2季度实现营业收入3963.3亿元,同比增长19.9%。净利润达到2525.9亿元,利润率为23.5%。企业服务部门扩张32.8%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+        },
+        {
+          "sample_id": 1,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"NVIDIA Corp.\", \"period\": \"Q1 2025\", \"revenue\": \"$26.4 billion\", \"yoy_growth\": \"-3.6%\", \"net_income\": \"$41.4 billion\", \"margin\": \"26.9%\", \"segment_highlight\": \"Cloud revenue grew 7.1%\"}",
+          "prediction": "For NVIDIA Corp. in Q1 2025, key financial metrics reveal a mixed performance. Revenue stood at $26.4 billion, marking a year-over-year decline of -3.6%. Notably, net income reached $41.4 billion, representing a margin of 26.9%, indicating strong profitability despite the revenue dip. The Cloud segm...",
+          "reference": "NVIDIA Corp. reported Q1 2025 revenue of $26.4 billion, representing a 3.6% year-over-year decline. Net income reached $41.4 billion with margins at 26.9%. Cloud revenue grew 7.1%, indicating headwinds in this business line. Looking ahead, cost optimization measures should help stabilize margins in ..."
+        },
+        {
+          "sample_id": 2,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"万科A\", \"period\": \"2023年Q3季度\", \"revenue\": \"343.7亿元\", \"yoy_growth\": \"+19.4%\", \"net_income\": \"3598.6亿元\", \"margin\": \"7.7%\", \"segment_highlight\": \"海外销售增长12.2%\"}",
+          "prediction": "万科A在2023年第三季度表现出色，实现营业收入343.7亿元，同比增长19.4%，净利润达到3598.6亿元，毛利率为7.7%。其中，海外销售增长了12.2%，显示出公司在国际市场的拓展取得了一定成效。这些数据表明公司正在稳步增长，并且在提升盈利能力方面也取得了进展。展望未来，随着公司在国内外市场的进一步布局，预计将继续保持稳健的增长态势。",
+          "reference": "万科A2023年Q3季度实现营业收入343.7亿元,同比增长19.4%。净利润达到3598.6亿元,利润率为7.7%。海外销售增长12.2%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+        },
+        {
+          "sample_id": 3,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"Intel Corp.\", \"period\": \"Q3 2023\", \"revenue\": \"$94.1 billion\", \"yoy_growth\": \"+30.9%\", \"net_income\": \"$133.6 billion\", \"margin\": \"28.8%\", \"segment_highlight\": \"International sales increas...",
+          "prediction": "For Intel Corp. in Q3 2023, key financial metrics highlight robust performance. Revenue reached $94.1 billion, marking a significant year-over-year growth of +30.9%. Net income surged to $133.6 billion, reflecting a margin of 28.8%. Notably, international sales grew by 6.6%, indicating expanding mar...",
+          "reference": "Intel Corp. reported Q3 2023 revenue of $94.1 billion, representing a 30.9% year-over-year growth. Net income reached $133.6 billion with margins at 28.8%. International sales increased 6.6%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiatives ..."
+        },
+        {
+          "sample_id": 4,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"招商银行\", \"period\": \"2023年Q4季度\", \"revenue\": \"4336.3亿元\", \"yoy_growth\": \"+17.9%\", \"net_income\": \"1627.9亿元\", \"margin\": \"16.8%\", \"segment_highlight\": \"海外销售增长26.1%\"}",
+          "prediction": "招商银行在2023年第四季度表现出色，实现营业收入4336.3亿元，同比增长17.9%，净利润达到1627.9亿元，毛利率维持在16.8%的高水平。特别值得注意的是，海外业务销售增长显著，增幅达26.1%，显示出公司在国际市场的拓展取得了积极成效。这些数据表明，招商银行不仅在国内市场稳固发展，同时也在国际市场展现了强劲的增长潜力。展望未来，随着国内外经济环境的进一步改善，预计招商银行将继续保持稳健的增长态势，并有望进一步提升其在全球市场的竞争力。",
+          "reference": "招商银行2023年Q4季度实现营业收入4336.3亿元,同比增长17.9%。净利润达到1627.9亿元,利润率为16.8%。海外销售增长26.1%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+        }
+      ],
+      "hallucination": [
+        {
+          "sample_id": 30,
+          "task": "fin_summary",
+          "input": "万科A发布了2025年Q3季度业绩报告。报告期内,公司实现营业收入1479.7亿元,同比下降34.3%。归属于上市公司股东的净利润为3292.9亿元,营业收入为10.7%。公司核心业务保持稳健增长,但也面临消费需求放缓等挑战。管理层表示将持续加大研发投入,推动有利的政策环境变化。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "{\n  \"summary\": \"万科A在2025年第三季度实现了1479.7亿元的营业收入，同比下降34.3%，净利润为3292.9亿元，同比增长10.7%，尽管面临消费需求放缓的挑战，但核心业务保持稳健。\",\n  \"key_points\": [\n    \"营业收入1479.7亿元，同比下降34.3%\",\n    \"净利润3292.9亿元，同比增长10.7%\",\n    \"核心业务保持稳健增长\",\n    \"期间费用率有所优化\",\n    \"经营现金流保持健康\"\n  ],\n  \"risks\": [\n    \"消费需求放缓\",\n    \"市场竞争加剧\"\n  ],\n  \"opportunities...",
+          "reference": "{\"summary\": \"万科A2025年Q3季度实现营收1479.7亿元,同比下降34.3%。净利润为3292.9亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入1479.7亿元,同比下降34.3%\", \"净利润3292.9亿元\", \"营业收入为10.7%\", \"持续加大研发投入\"], \"risks\": [\"汇率波动风险\", \"消费需求放缓\"], \"opportunities\": [\"AI解决方案需求增长\", \"有利的政策环境变化\"]}"
+        },
+        {
+          "sample_id": 32,
+          "task": "fin_summary",
+          "input": "阿里巴巴发布了2024年Q4季度业绩报告。报告期内,公司实现营业收入4753.0亿元,同比增长30.2%。归属于上市公司股东的净利润为501.3亿元,营业利润为24.5%。公司核心业务保持稳健增长,但也面临原材料成本上涨等挑战。管理层表示将持续加大研发投入,推动有利的政策环境变化。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "{\n  \"summary\": \"阿里巴巴在2024年Q4季度实现了4753.0亿元的营业收入，同比增长30.2%，净利润为501.3亿元，营业利润率为24.5%，显示出稳健的增长态势。\",\n  \"key_points\": [\n    \"营业收入同比增长30.2%\",\n    \"净利润为501.3亿元\",\n    \"营业利润率为24.5%\",\n    \"核心业务保持稳健增长\",\n    \"期间费用率有所优化\",\n    \"经营现金流保持健康\"\n  ],\n  \"risks\": [\n    \"原材料成本上涨\",\n    \"市场竞争加剧\"\n  ],\n  \"opportunities\": [\n    \"...",
+          "reference": "{\"summary\": \"阿里巴巴2024年Q4季度实现营收4753.0亿元,同比增长30.2%。净利润为501.3亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入4753.0亿元,同比增长30.2%\", \"净利润501.3亿元\", \"营业利润为24.5%\", \"持续加大研发投入\"], \"risks\": [\"消费需求放缓\", \"原材料成本上涨\"], \"opportunities\": [\"成本优化带来的利润提升\"]}"
+        },
+        {
+          "sample_id": 36,
+          "task": "fin_summary",
+          "input": "隆基绿能发布了2025年Q3季度业绩报告。报告期内,公司实现营业收入1704.2亿元,同比增长11.3%。归属于上市公司股东的净利润为795.0亿元,营业利润为1.6%。公司核心业务保持稳健增长,但也面临汇率波动风险等挑战。管理层表示将持续加大研发投入,推动AI解决方案需求增长。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "{\n  \"summary\": \"隆基绿能在2025年第三季度实现了1704.2亿元的营业收入，同比增长11.3%，但营业利润率为1.6%，净利润为795.0亿元。\",\n  \"key_points\": [\n    \"营业收入1704.2亿元，同比增长11.3%\",\n    \"净利润795.0亿元\",\n    \"营业利润率为1.6%\",\n    \"期间费用率有所优化\",\n    \"经营现金流保持健康\"\n  ],\n  \"risks\": [\n    \"汇率波动风险\"\n  ],\n  \"opportunities\": [\n    \"持续加大研发投入\",\n    \"推动AI解决方案需求增长\"\n  ]\n}",
+          "reference": "{\"summary\": \"隆基绿能2025年Q3季度实现营收1704.2亿元,同比增长11.3%。净利润为795.0亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入1704.2亿元,同比增长11.3%\", \"净利润795.0亿元\", \"营业利润为1.6%\", \"持续加大研发投入\"], \"risks\": [\"原材料成本上涨\", \"网络安全威胁\", \"供应链中断风险\"], \"opportunities\": [\"有利的政策环境变化\", \"新产品发布周期\"]}"
+        },
+        {
+          "sample_id": 37,
+          "task": "fin_summary",
+          "input": "招商银行发布了2023年Q3季度业绩报告。报告期内,公司实现营业收入4767.3亿元,同比下降19.7%。归属于上市公司股东的净利润为3933.1亿元,营业收入为18.5%。公司核心业务保持稳健增长,但也面临核心市场竞争加剧等挑战。管理层表示将持续加大研发投入,推动战略合作伙伴关系拓展。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "{\n  \"summary\": \"招商银行在2023年第三季度实现了3933.1亿元的净利润，但营业收入下降了19.7%，显示出市场压力增大。\",\n  \"key_points\": [\n    \"2023年Q3实现营业收入4767.3亿元\",\n    \"净利润为3933.1亿元\",\n    \"营业收入同比下降19.7%\",\n    \"核心业务保持稳健增长\"\n  ],\n  \"risks\": [\n    \"核心市场竞争加剧\",\n    \"营业收入下降\"\n  ],\n  \"opportunities\": [\n    \"持续加大研发投入\",\n    \"拓展战略合作伙伴关系\"\n  ]\n}",
+          "reference": "{\"summary\": \"招商银行2023年Q3季度实现营收4767.3亿元,同比下降19.7%。净利润为3933.1亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入4767.3亿元,同比下降19.7%\", \"净利润3933.1亿元\", \"营业收入为18.5%\", \"持续加大研发投入\"], \"risks\": [\"核心市场竞争加剧\", \"供应链中断风险\"], \"opportunities\": [\"战略合作伙伴关系拓展\", \"有利的政策环境变化\"]}"
+        },
+        {
+          "sample_id": 38,
+          "task": "fin_summary",
+          "input": "腾讯控股发布了2023年Q2季度业绩报告。报告期内,公司实现营业收入3581.6亿元,同比增长33.1%。归属于上市公司股东的净利润为189.7亿元,净利润为8.3%。公司核心业务保持稳健增长,但也面临消费需求放缓等挑战。管理层表示将持续加大研发投入,推动新兴市场拓展机会。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "{\n  \"summary\": \"腾讯控股在2023年第二季度实现了显著的增长，收入同比增长33.1%，但同时也面临着消费需求放缓的挑战。\",\n  \"key_points\": [\n    \"营业收入3581.6亿元，同比增长33.1%\",\n    \"净利润189.7亿元，净利润率为8.3%\",\n    \"核心业务保持稳健增长\",\n    \"期间费用率有所优化\",\n    \"经营现金流保持健康水平\"\n  ],\n  \"risks\": [\n    \"消费需求放缓\",\n    \"市场竞争加剧\"\n  ],\n  \"opportunities\": [\n    \"持续加大研发投入\",\n    \"推动新兴市场拓展...",
+          "reference": "{\"summary\": \"腾讯控股2023年Q2季度实现营收3581.6亿元,同比增长33.1%。净利润为189.7亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入3581.6亿元,同比增长33.1%\", \"净利润189.7亿元\", \"净利润为8.3%\", \"持续加大研发投入\"], \"risks\": [\"消费需求放缓\", \"人才流失风险\"], \"opportunities\": [\"新产品发布周期\", \"成本优化带来的利润提升\"]}"
+        }
+      ]
+    },
+    "per_task_errors": {
+      "analysis_gen": {
+        "partial_match": 10
+      },
+      "doc_qa": {
+        "partial_match": 10
+      },
+      "event_extraction": {
+        "partial_match": 10
+      },
+      "fin_summary": {
+        "hallucination": 5,
+        "partial_match": 5
+      }
+    }
+  }
+}
