@@ -76,7 +76,7 @@ def _make_training_args(cfg: TrainConfig, output_dir: Path, use_bf16: bool, use_
         logger.info("Using TRL SFTConfig (TRL >= 1.0)")
         return SFTConfig(
             **common,
-            max_seq_length=cfg.max_seq_length,
+            max_length=cfg.max_seq_length,
             dataset_text_field="text",
         ), False
     except ImportError:
