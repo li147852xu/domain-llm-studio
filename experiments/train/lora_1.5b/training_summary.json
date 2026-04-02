@@ -1,0 +1,36 @@
+{
+  "total_steps": 60,
+  "num_epochs": 3.0,
+  "best_metric": 0.20777158439159393,
+  "training_config": {
+    "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
+    "adapter_type": "lora",
+    "lora": {
+      "r": 16,
+      "alpha": 32,
+      "dropout": 0.05,
+      "target_modules": null,
+      "bias": "none",
+      "task_type": "CAUSAL_LM"
+    },
+    "data_dir": "data/processed",
+    "output_dir": "experiments/train/lora_1.5b",
+    "learning_rate": 0.0002,
+    "num_epochs": 3,
+    "per_device_batch_size": 2,
+    "gradient_accumulation_steps": 8,
+    "warmup_ratio": 0.05,
+    "max_seq_length": 1536,
+    "eval_steps": 50,
+    "save_steps": 100,
+    "logging_steps": 10,
+    "bf16": true,
+    "seed": 42,
+    "device_map": "auto"
+  },
+  "final_train_loss": 0.6294,
+  "final_eval_loss": 0.2078,
+  "final_train_accuracy": 0.932,
+  "final_eval_accuracy": 0.931,
+  "train_runtime_seconds": 1527
+}

@@ -1,0 +1,142 @@
+{
+  "model": "base",
+  "model_path": "Qwen/Qwen2.5-1.5B-Instruct",
+  "adapter_path": null,
+  "per_task": {
+    "analysis_gen": {
+      "format_compliance": 1.0,
+      "field_completeness": 0.4,
+      "schema_match": 0.7
+    },
+    "doc_qa": {
+      "exact_match": 0.9,
+      "token_f1": 0.9545454545454545,
+      "grounding_rate": 1.0
+    },
+    "event_extraction": {
+      "entity_precision": 0.0,
+      "entity_recall": 0.0,
+      "entity_f1": 0.0,
+      "event_precision": 0.0,
+      "event_recall": 0.0,
+      "event_f1": 0.0,
+      "parse_failure_rate": 0.0
+    },
+    "fin_summary": {
+      "rouge1": 0.6581970339418068,
+      "rouge2": 0.4747443401988541,
+      "rougeL": 0.5981768615576424,
+      "keypoint_coverage": 0.5451913604203361
+    }
+  },
+  "error_analysis": {
+    "error_distribution": {
+      "partial_match": 29,
+      "grounding_failure": 1,
+      "format_violation": 10
+    },
+    "total_errors": 40,
+    "total_samples": 40,
+    "error_rate": 1.0,
+    "examples": {
+      "partial_match": [
+        {
+          "sample_id": 0,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"中国移动\", \"period\": \"2023年Q2季度\", \"revenue\": \"3963.3亿元\", \"yoy_growth\": \"+19.9%\", \"net_income\": \"2525.9亿元\", \"margin\": \"23.5%\", \"segment_highlight\": \"企业服务部门扩张32.8%\"}",
+          "prediction": "In the second quarter of 2023, China Mobile reported revenue of 3963.3亿元, marking a year-over-year growth of +19.9%. This strong performance underscores the company's continued expansion into new markets and services, particularly within its enterprise segment, which saw a notable increase of 32.8%....",
+          "reference": "中国移动2023年Q2季度实现营业收入3963.3亿元,同比增长19.9%。净利润达到2525.9亿元,利润率为23.5%。企业服务部门扩张32.8%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+        },
+        {
+          "sample_id": 1,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"NVIDIA Corp.\", \"period\": \"Q1 2025\", \"revenue\": \"$26.4 billion\", \"yoy_growth\": \"-3.6%\", \"net_income\": \"$41.4 billion\", \"margin\": \"26.9%\", \"segment_highlight\": \"Cloud revenue grew 7.1%\"}",
+          "prediction": "In Q1 2025, NVIDIA reported a revenue of $26.4 billion, marking a -3.6% year-over-year decrease from Q1 2024. This decline is primarily attributed to reduced demand in traditional markets such as gaming and automotive sectors. Despite the overall revenue drop, NVIDIA maintained strong profitability,...",
+          "reference": "NVIDIA Corp. reported Q1 2025 revenue of $26.4 billion, representing a 3.6% year-over-year decline. Net income reached $41.4 billion with margins at 26.9%. Cloud revenue grew 7.1%, indicating headwinds in this business line. Looking ahead, cost optimization measures should help stabilize margins in ..."
+        },
+        {
+          "sample_id": 2,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"万科A\", \"period\": \"2023年Q3季度\", \"revenue\": \"343.7亿元\", \"yoy_growth\": \"+19.4%\", \"net_income\": \"3598.6亿元\", \"margin\": \"7.7%\", \"segment_highlight\": \"海外销售增长12.2%\"}",
+          "prediction": "In the third quarter of 2023, the performance of万科A was robust, as evidenced by its revenue growth of +19.4%, which is significantly higher than the previous year. This indicates a strong momentum in the company's operations during the quarter. The net income of RMB 359.86 billion further underscore...",
+          "reference": "万科A2023年Q3季度实现营业收入343.7亿元,同比增长19.4%。净利润达到3598.6亿元,利润率为7.7%。海外销售增长12.2%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+        },
+        {
+          "sample_id": 3,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"Intel Corp.\", \"period\": \"Q3 2023\", \"revenue\": \"$94.1 billion\", \"yoy_growth\": \"+30.9%\", \"net_income\": \"$133.6 billion\", \"margin\": \"28.8%\", \"segment_highlight\": \"International sales increas...",
+          "prediction": "In Q3 2023, Intel Corporation reported robust performance across its international operations, marking a significant increase of 6.6% over the previous quarter. This growth is reflected in both revenue and net income figures, which stood at $94.1 billion and $133.6 billion respectively, showcasing a...",
+          "reference": "Intel Corp. reported Q3 2023 revenue of $94.1 billion, representing a 30.9% year-over-year growth. Net income reached $133.6 billion with margins at 28.8%. International sales increased 6.6%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiatives ..."
+        },
+        {
+          "sample_id": 4,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"招商银行\", \"period\": \"2023年Q4季度\", \"revenue\": \"4336.3亿元\", \"yoy_growth\": \"+17.9%\", \"net_income\": \"1627.9亿元\", \"margin\": \"16.8%\", \"segment_highlight\": \"海外销售增长26.1%\"}",
+          "prediction": "In the fourth quarter of 2023, our bank achieved robust performance, recording revenue of 4336.3亿元, marking a year-over-year growth of +17.9%. This strong performance is driven by diversified income streams across various segments, including domestic sales which grew by 15.2%, and overseas sales, wh...",
+          "reference": "招商银行2023年Q4季度实现营业收入4336.3亿元,同比增长17.9%。净利润达到1627.9亿元,利润率为16.8%。海外销售增长26.1%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+        }
+      ],
+      "grounding_failure": [
+        {
+          "sample_id": 10,
+          "task": "doc_qa",
+          "input": "Context: On 2024-08-26, Mastercard Inc. announced the appointment of Michael Chen as the new CEO, replacing Michael Chen who served in the role for 9 years. The board cited the need for fresh leadersh...",
+          "prediction": "{\n  \"answer\": \"The leadership change was made due to the need for fresh leadership to navigate the company's expansion into semiconductors.\",\n  \"evidence_span\": \"On 2024-08-26, Mastercard Inc. announced the appointment of Michael Chen as the new CEO, replacing Michael Chen who served in the role for...",
+          "reference": "{\"answer\": \"to navigate the company's expansion into semiconductors\", \"evidence_span\": \"to navigate the company's expansion into semiconductors\"}"
+        }
+      ],
+      "format_violation": [
+        {
+          "sample_id": 30,
+          "task": "fin_summary",
+          "input": "万科A发布了2025年Q3季度业绩报告。报告期内,公司实现营业收入1479.7亿元,同比下降34.3%。归属于上市公司股东的净利润为3292.9亿元,营业收入为10.7%。公司核心业务保持稳健增长,但也面临消费需求放缓等挑战。管理层表示将持续加大研发投入,推动有利的政策环境变化。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "```json\n{\n  \"summary\": \"万科A发布2025年第三季度业绩，营收和利润均下降，但核心业务稳健增长。\",\n  \"key_points\": [\n    \"营业收入1479.7亿元，同比减少34.3%\",\n    \"归属于上市公司股东的净利润3292.9亿元，同比增长10.7%\"\n  ],\n  \"risks\": [\n    \"消费需求放缓\"\n  ],\n  \"opportunities\": [\n    \"持续加大研发投入，推动有利的政策环境变化\"\n  ]\n}\n```",
+          "reference": "{\"summary\": \"万科A2025年Q3季度实现营收1479.7亿元,同比下降34.3%。净利润为3292.9亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入1479.7亿元,同比下降34.3%\", \"净利润3292.9亿元\", \"营业收入为10.7%\", \"持续加大研发投入\"], \"risks\": [\"汇率波动风险\", \"消费需求放缓\"], \"opportunities\": [\"AI解决方案需求增长\", \"有利的政策环境变化\"]}"
+        },
+        {
+          "sample_id": 31,
+          "task": "fin_summary",
+          "input": "Meta Platforms reported Q4 2023 financial results. Total revenue reached $113.5 billion, representing a 30.3% increase year-over-year. Net income came in at $23.3 billion, with gross_margin at 6.9%. T...",
+          "prediction": "```json\n{\n  \"summary\": \"Meta Platforms reported robust Q4 2023 financials, achieving a 30.3% revenue growth and net income of $23.3 billion, driven by strong performance across core business segments.\",\n  \"key_points\": [\n    \"Total revenue: $113.5 billion (30.3% YOY)\",\n    \"Net Income: $23.3 billion...",
+          "reference": "{\"summary\": \"Meta Platforms delivered Q4 2023 results with revenue of $113.5 billion, a 30.3% YoY increase. Net income reached $23.3 billion. Management raised guidance for the full year.\", \"key_points\": [\"Revenue of $113.5 billion (30.3% YoY growth)\", \"Net income at $23.3 billion\", \"gross_margin at..."
+        },
+        {
+          "sample_id": 32,
+          "task": "fin_summary",
+          "input": "阿里巴巴发布了2024年Q4季度业绩报告。报告期内,公司实现营业收入4753.0亿元,同比增长30.2%。归属于上市公司股东的净利润为501.3亿元,营业利润为24.5%。公司核心业务保持稳健增长,但也面临原材料成本上涨等挑战。管理层表示将持续加大研发投入,推动有利的政策环境变化。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "```json\n{\n  \"summary\": \"阿里巴巴发布2024年Q4季度业绩，营收和净利润均创历史新高，但面临原材料成本上升等挑战。\",\n  \"key_points\": [\n    \"营业收入4753.0亿元，同比增长30.2%\",\n    \"归属于上市公司股东的净利润501.3亿元\",\n    \"营业利润24.5%\"\n  ],\n  \"risks\": [\n    \"原材料成本上涨\"\n  ],\n  \"opportunities\": [\n    \"持续加大研发投入，推动有利的政策环境变化\"\n  ]\n}\n```",
+          "reference": "{\"summary\": \"阿里巴巴2024年Q4季度实现营收4753.0亿元,同比增长30.2%。净利润为501.3亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入4753.0亿元,同比增长30.2%\", \"净利润501.3亿元\", \"营业利润为24.5%\", \"持续加大研发投入\"], \"risks\": [\"消费需求放缓\", \"原材料成本上涨\"], \"opportunities\": [\"成本优化带来的利润提升\"]}"
+        },
+        {
+          "sample_id": 33,
+          "task": "fin_summary",
+          "input": "JPMorgan Chase reported Q4 2024 financial results. Total revenue reached $83.5 billion, representing a 9.6% increase year-over-year. Net income came in at $71.7 billion, with gross_margin at 25.3%. Th...",
+          "prediction": "```json\n{\n  \"summary\": \"JPMorgan Chase reported robust Q4 2024 financials, with total revenue up 9.6% and net income reaching $71.7 billion, driven by strong core business performance.\",\n  \"key_points\": [\n    \"Total revenue increased by 9.6% year-over-year\",\n    \"Net income rose to $71.7 billion\",\n ...",
+          "reference": "{\"summary\": \"JPMorgan Chase delivered Q4 2024 results with revenue of $83.5 billion, a 9.6% YoY increase. Net income reached $71.7 billion. Management raised guidance for the full year.\", \"key_points\": [\"Revenue of $83.5 billion (9.6% YoY growth)\", \"Net income at $71.7 billion\", \"gross_margin at 25...."
+        },
+        {
+          "sample_id": 34,
+          "task": "fin_summary",
+          "input": "Qualcomm Inc. reported Q1 2025 financial results. Total revenue reached $143.5 billion, representing a 20.3% increase year-over-year. Net income came in at $100.7 billion, with gross_margin at 15.3%. ...",
+          "prediction": "```json\n{\n  \"summary\": \"Qualcomm reported robust Q1 2025 financials, achieving a 20.3% revenue growth and net income of $100.7 billion, driven by strong AI solution demand.\",\n  \"key_points\": [\n    \"$143.5 billion total revenue\",\n    \"20.3% year-over-year revenue growth\",\n    \"$100.7 billion net inco...",
+          "reference": "{\"summary\": \"Qualcomm Inc. delivered Q1 2025 results with revenue of $143.5 billion, a 20.3% YoY increase. Net income reached $100.7 billion. Management raised guidance for the full year.\", \"key_points\": [\"Revenue of $143.5 billion (20.3% YoY growth)\", \"Net income at $100.7 billion\", \"gross_margin a..."
+        }
+      ]
+    },
+    "per_task_errors": {
+      "analysis_gen": {
+        "partial_match": 10
+      },
+      "doc_qa": {
+        "grounding_failure": 1,
+        "partial_match": 9
+      },
+      "event_extraction": {
+        "partial_match": 10
+      },
+      "fin_summary": {
+        "format_violation": 10
+      }
+    }
+  }
+}

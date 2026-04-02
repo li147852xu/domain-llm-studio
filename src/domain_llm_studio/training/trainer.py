@@ -7,6 +7,7 @@ import logging
 from pathlib import Path
 
 from datasets import Dataset
+from transformers import TrainingArguments
 
 from domain_llm_studio.config import AdapterType, TrainConfig
 from domain_llm_studio.data.stats import load_jsonl
@@ -47,7 +48,7 @@ def _build_chat_dataset(data_dir: Path, tokenizer, max_seq_length: int) -> tuple
 
 def run_training(cfg: TrainConfig) -> Path:
     """Execute the full training pipeline. Returns path to saved adapter."""
-    from trl import SFTConfig, SFTTrainer
+    from trl import SFTTrainer
 
     logging.basicConfig(level=logging.INFO)
     output_dir = Path(cfg.output_dir)
@@ -56,6 +57,7 @@ def run_training(cfg: TrainConfig) -> Path:
     device = detect_device()
     logger.info("Training on device: %s", device)
 
+    # Save config for reproducibility
     config_path = output_dir / "train_config.json"
     with open(config_path, "w") as f:
         json.dump(cfg.model_dump(), f, indent=2, default=str)
@@ -84,21 +86,14 @@ def run_training(cfg: TrainConfig) -> Path:
     use_bf16 = cfg.bf16 and device == "cuda"
     use_fp16 = not use_bf16 and device != "cpu"
 
-    total_steps = (
-        len(train_dataset)
-        // (cfg.per_device_batch_size * cfg.gradient_accumulation_steps)
-        * cfg.num_epochs
-    )
-    warmup_steps = int(total_steps * cfg.warmup_ratio)
-
-    training_args = SFTConfig(
+    training_args = TrainingArguments(
         output_dir=str(output_dir),
         num_train_epochs=cfg.num_epochs,
         per_device_train_batch_size=cfg.per_device_batch_size,
         per_device_eval_batch_size=cfg.per_device_batch_size,
         gradient_accumulation_steps=cfg.gradient_accumulation_steps,
         learning_rate=cfg.learning_rate,
-        warmup_steps=warmup_steps,
+        warmup_ratio=cfg.warmup_ratio,
         logging_steps=cfg.logging_steps,
         eval_strategy="steps",
         eval_steps=cfg.eval_steps,
@@ -113,8 +108,6 @@ def run_training(cfg: TrainConfig) -> Path:
         load_best_model_at_end=True,
         metric_for_best_model="eval_loss",
         greater_is_better=False,
-        max_length=cfg.max_seq_length,
-        dataset_text_field="text",
     )
 
     callbacks = [
@@ -129,6 +122,7 @@ def run_training(cfg: TrainConfig) -> Path:
         eval_dataset=dev_dataset,
         processing_class=tokenizer,
         callbacks=callbacks,
+        max_seq_length=cfg.max_seq_length,
     )
 
     logger.info("Starting training...")

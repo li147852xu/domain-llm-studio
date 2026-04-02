@@ -175,6 +175,28 @@ uv run domain-llm-studio train --config configs/training/lora_7b_cloud.yaml
 uv run domain-llm-studio train --config configs/training/qlora_7b_cloud.yaml
 ```
 
+### Cloud Training & Artifact Transfer
+
+Model weights (`.safetensors`) are gitignored to keep the repo lightweight. To train on cloud and bring results back locally:
+
+```bash
+# === On cloud machine (A100/4090) ===
+git clone <your-repo-url> && cd domain-llm-studio
+uv sync
+uv run domain-llm-studio build-data --num-samples 50
+uv run domain-llm-studio train --config configs/training/lora_7b_cloud.yaml
+uv run domain-llm-studio eval --config configs/eval/tuned.yaml
+
+# Package adapter + results (lightweight, ~200-400MB)
+bash scripts/transfer_results.sh pack lora_7b
+
+# === Transfer to local machine ===
+scp cloud:/path/to/domain-llm-studio/lora_7b_results.tar.gz .
+
+# === On local machine ===
+bash scripts/transfer_results.sh unpack lora_7b_results.tar.gz
+```
+
 ## Evaluation System
 
 The evaluation system is the **project centerpiece** — demonstrating not just training ability but systematic assessment.
@@ -200,11 +222,60 @@ The system classifies prediction failures into actionable categories:
 | **Truncation** | Output significantly shorter than expected |
 | **Grounding failure** | QA answer not traceable to context |
 
+### Results: Base vs LoRA-Tuned (Qwen2.5-1.5B, 3 epochs, M4 Mac MPS)
+
+**Financial Summarization** — ROUGE-2 nearly doubled:
+
+| Metric | Base | LoRA-Tuned | Delta |
+|--------|------|------------|-------|
+| ROUGE-1 | 0.658 | **0.918** | +0.260 |
+| ROUGE-2 | 0.475 | **0.902** | **+0.427** |
+| ROUGE-L | 0.598 | **0.914** | +0.316 |
+| Keypoint Coverage | 0.545 | **0.805** | +0.260 |
+
+**Event Extraction** — from zero to functional:
+
+| Metric | Base | LoRA-Tuned | Delta |
+|--------|------|------------|-------|
+| Entity F1 | 0.000 | **0.200** | +0.200 |
+| Event F1 | 0.000 | **0.200** | +0.200 |
+
+**Document QA** — reached perfect score:
+
+| Metric | Base | LoRA-Tuned | Delta |
+|--------|------|------------|-------|
+| Exact Match | 0.900 | **1.000** | +0.100 |
+| Token F1 | 0.955 | **1.000** | +0.045 |
+| Grounding Rate | 1.000 | 1.000 | — |
+
+**Structured Analysis** — field completeness fully resolved:
+
+| Metric | Base | LoRA-Tuned | Delta |
+|--------|------|------------|-------|
+| Format Compliance | 1.000 | 1.000 | — |
+| Field Completeness | 0.400 | **1.000** | **+0.600** |
+| Schema Match | 0.700 | **1.000** | +0.300 |
+
+**Error Analysis** — error rate dropped from 100% to 57.5%:
+
+| | Base | LoRA-Tuned |
+|---|------|------------|
+| Error Rate | 100% | **57.5%** |
+| Format Violation | 10 | **0** |
+| Grounding Failure | 1 | **0** |
+| Partial Match | 29 | 18 |
+| Hallucination | 0 | 5 |
+
+> Training: 3 epochs, 60 steps, 25 min on Apple M4 MPS. LoRA r=16/α=32, 18.5M trainable params (1.18% of 1.56B). Train loss converged from 1.878 → 0.207 with no overfitting (eval loss 0.208).
+
 ### Comparison Reports
 
 ```bash
 # Run evaluation with base model
-uv run domain-llm-studio eval
+uv run domain-llm-studio eval --config configs/eval/default.yaml
+
+# Run evaluation with tuned model
+uv run domain-llm-studio eval --config configs/eval/tuned.yaml
 
 # Generate side-by-side comparison report
 uv run domain-llm-studio compare
