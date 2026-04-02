@@ -18,6 +18,7 @@ venv/
 *.bin
 *.safetensors
 adapter_model/
+models/
 experiments/train/*/adapter/
 experiments/train/*/checkpoint-*/
 

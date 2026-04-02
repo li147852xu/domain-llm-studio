@@ -1,4 +1,4 @@
-base_model: "Qwen/Qwen2.5-7B-Instruct"
+base_model: "models/Qwen2.5-7B-Instruct"
 adapter_type: "lora"
 lora:
   r: 16
