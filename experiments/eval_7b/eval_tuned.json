@@ -2,6 +2,7 @@
   "model": "tuned",
   "model_path": "models/Qwen2.5-7B-Instruct",
   "adapter_path": "experiments/train/lora_7b/adapter",
+  "model_variant": "base",
   "per_task": {
     "analysis_gen": {
       "format_compliance": 1.0,
@@ -14,66 +15,68 @@
       "grounding_rate": 1.0
     },
     "event_extraction": {
-      "entity_precision": 0.0,
-      "entity_recall": 0.0,
-      "entity_f1": 0.0,
-      "event_precision": 0.0,
-      "event_recall": 0.0,
-      "event_f1": 0.0,
-      "parse_failure_rate": 0.0
+      "entity_precision": 1.0,
+      "entity_recall": 1.0,
+      "entity_f1": 1.0,
+      "event_precision": 0.4,
+      "event_recall": 0.4,
+      "event_f1": 0.4,
+      "parse_failure_rate": 0.0,
+      "key_presence_rate": 1.0,
+      "entity_match_rate": 1.0,
+      "partial_field_match": 0.9
     },
     "fin_summary": {
-      "rouge1": 0.9160869397277522,
-      "rouge2": 0.8983820010941128,
-      "rougeL": 0.9160869397277522,
-      "keypoint_coverage": 0.795170135442431
+      "rouge1": 0.9165040408747804,
+      "rouge2": 0.9002177498863834,
+      "rougeL": 0.9165040408747804,
+      "keypoint_coverage": 0.7927311110521872
     }
   },
   "error_analysis": {
     "error_distribution": {
-      "partial_match": 20,
-      "hallucination": 4,
-      "format_violation": 1
+      "partial_match": 16,
+      "hallucination": 5
     },
-    "total_errors": 25,
+    "total_errors": 21,
     "total_samples": 40,
-    "error_rate": 0.625,
+    "error_rate": 0.525,
     "examples": {
       "partial_match": [
         {
-          "sample_id": 1,
+          "sample_id": 0,
           "task": "analysis_gen",
-          "input": "{\"company\": \"NVIDIA Corp.\", \"period\": \"Q1 2025\", \"revenue\": \"$26.4 billion\", \"yoy_growth\": \"-3.6%\", \"net_income\": \"$41.4 billion\", \"margin\": \"26.9%\", \"segment_highlight\": \"Cloud revenue grew 7.1%\"}",
-          "prediction": "NVIDIA Corp. reported Q1 2025 revenue of $26.4 billion, representing a 3.6% year-over-year decline. Net income reached $41.4 billion with margins at 26.9%. Cloud revenue grew 7.1%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiatives should supp...",
-          "reference": "NVIDIA Corp. reported Q1 2025 revenue of $26.4 billion, representing a 3.6% year-over-year decline. Net income reached $41.4 billion with margins at 26.9%. Cloud revenue grew 7.1%, indicating headwinds in this business line. Looking ahead, cost optimization measures should help stabilize margins in ..."
+          "input": "{\"company\": \"海天味业\", \"period\": \"2025年Q3季度\", \"revenue\": \"2716.0亿元\", \"yoy_growth\": \"-17.9%\", \"net_income\": \"2835.7亿元\", \"margin\": \"19.7%\", \"segment_highlight\": \"消费板块收入下降17.2%\"}",
+          "prediction": "海天味业2025年Q3季度实现营业收入2716.0亿元,同比下降17.9%。净利润达到2835.7亿元,利润率为19.7%。消费板块收入下降17.2%,表明成本优化措施可能尚未完全见效。展望未来,持续的成本控制有望推动利润率进一步提升。",
+          "reference": "海天味业2025年Q3季度实现营业收入2716.0亿元,同比下滑17.9%。净利润达到2835.7亿元,利润率为19.7%。消费板块收入下降17.2%,面临一定经营压力。展望未来,成本优化措施有望帮助稳定利润水平。"
         },
         {
-          "sample_id": 2,
+          "sample_id": 1,
           "task": "analysis_gen",
-          "input": "{\"company\": \"万科A\", \"period\": \"2023年Q3季度\", \"revenue\": \"343.7亿元\", \"yoy_growth\": \"+19.4%\", \"net_income\": \"3598.6亿元\", \"margin\": \"7.7%\", \"segment_highlight\": \"海外销售增长12.2%\"}",
-          "prediction": "万科A 2023年Q3季度实现营业收入343.7亿元,同比增长19.4%。净利润达到3598.6亿元,利润率为7.7%。海外销售增长12.2%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。",
-          "reference": "万科A2023年Q3季度实现营业收入343.7亿元,同比增长19.4%。净利润达到3598.6亿元,利润率为7.7%。海外销售增长12.2%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+          "input": "{\"company\": \"Alphabet Inc.\", \"period\": \"Q4 2023\", \"revenue\": \"$98.1 billion\", \"yoy_growth\": \"+1.5%\", \"net_income\": \"$6.16 billion\", \"margin\": \"14.6%\", \"segment_highlight\": \"International sales increas...",
+          "prediction": "Alphabet Inc. reported Q4 2023 revenue of $98.1 billion, representing a 1.5% year-over-year growth. Net income reached $6.16 billion with margins at 14.6%. International sales increased 1.6%, indicating continued expansion in this market. Looking ahead, sustained investment in growth initiatives sho...",
+          "reference": "Alphabet Inc. reported Q4 2023 revenue of $98.1 billion, representing a 1.5% year-over-year growth. Net income reached $6.16 billion with margins at 14.6%. International sales increased 1.6%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiatives ..."
         },
         {
           "sample_id": 3,
           "task": "analysis_gen",
-          "input": "{\"company\": \"Intel Corp.\", \"period\": \"Q3 2023\", \"revenue\": \"$94.1 billion\", \"yoy_growth\": \"+30.9%\", \"net_income\": \"$133.6 billion\", \"margin\": \"28.8%\", \"segment_highlight\": \"International sales increas...",
-          "prediction": "Intel Corp. reported Q3 2023 revenue of $94.1 billion, representing a 30.9% year-over-year growth. Net income reached $133.6 billion with margins at 28.8%. International sales increased 6.6%, indicating strong momentum in this business line. Looking ahead, continued investment in R&D should support ...",
-          "reference": "Intel Corp. reported Q3 2023 revenue of $94.1 billion, representing a 30.9% year-over-year growth. Net income reached $133.6 billion with margins at 28.8%. International sales increased 6.6%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiatives ..."
+          "input": "{\"company\": \"Netflix Inc.\", \"period\": \"Q2 2023\", \"revenue\": \"$72.4 billion\", \"yoy_growth\": \"+8.1%\", \"net_income\": \"$59.6 billion\", \"margin\": \"20.6%\", \"segment_highlight\": \"Enterprise division expanded...",
+          "prediction": "Netflix Inc. reported Q2 2023 revenue of $72.4 billion, representing a 8.1% year-over-year growth. Net income reached $59.6 billion with margins at 20.6%. Enterprise division expanded by 19.1%, indicating strong momentum in this business line. Looking ahead, continued investment in this segment shou...",
+          "reference": "Netflix Inc. reported Q2 2023 revenue of $72.4 billion, representing a 8.1% year-over-year growth. Net income reached $59.6 billion with margins at 20.6%. Enterprise division expanded by 19.1%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiative..."
         },
         {
           "sample_id": 6,
           "task": "analysis_gen",
-          "input": "{\"company\": \"阿里巴巴\", \"period\": \"2025年Q1季度\", \"revenue\": \"3619.3亿元\", \"yoy_growth\": \"-28.1%\", \"net_income\": \"868.6亿元\", \"margin\": \"29.2%\", \"segment_highlight\": \"企业服务部门扩张31.9%\"}",
-          "prediction": "阿里巴巴2025年Q1季度实现营业收入3619.3亿元,同比下降28.1%。净利润达到868.6亿元,利润率为29.2%。企业服务部门扩张31.9%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。",
-          "reference": "阿里巴巴2025年Q1季度实现营业收入3619.3亿元,同比下滑28.1%。净利润达到868.6亿元,利润率为29.2%。企业服务部门扩张31.9%,面临一定经营压力。展望未来,成本优化措施有望帮助稳定利润水平。"
+          "input": "{\"company\": \"万科A\", \"period\": \"2024年Q1季度\", \"revenue\": \"1834.9亿元\", \"yoy_growth\": \"+21.8%\", \"net_income\": \"359.0亿元\", \"margin\": \"32.7%\", \"segment_highlight\": \"云业务收入增长8.5%\"}",
+          "prediction": "万科A 2024年Q1季度实现营业收入1834.9亿元,同比增长21.8%。净利润达到359.0亿元,利润率为32.7%。云业务收入增长8.5%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。",
+          "reference": "万科A2024年Q1季度实现营业收入1834.9亿元,同比增长21.8%。净利润达到359.0亿元,利润率为32.7%。云业务收入增长8.5%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
         },
         {
-          "sample_id": 8,
+          "sample_id": 7,
           "task": "analysis_gen",
-          "input": "{\"company\": \"Netflix Inc.\", \"period\": \"Q4 2025\", \"revenue\": \"$48.9 billion\", \"yoy_growth\": \"-9.6%\", \"net_income\": \"$82.1 billion\", \"margin\": \"14.1%\", \"segment_highlight\": \"International sales increase...",
-          "prediction": "Netflix Inc. reported Q4 2025 revenue of $48.9 billion, representing a 9.6% year-over-year decline. Net income reached $82.1 billion with margins at 14.1%. International sales grew 16.7%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiatives shou...",
-          "reference": "Netflix Inc. reported Q4 2025 revenue of $48.9 billion, representing a 9.6% year-over-year decline. Net income reached $82.1 billion with margins at 14.1%. International sales increased 16.7%, indicating headwinds in this business line. Looking ahead, cost optimization measures should help stabilize..."
+          "input": "{\"company\": \"恒瑞医药\", \"period\": \"2024年Q3季度\", \"revenue\": \"50.6亿元\", \"yoy_growth\": \"-15.9%\", \"net_income\": \"1468.1亿元\", \"margin\": \"9.2%\", \"segment_highlight\": \"海外销售增长20.3%\"}",
+          "prediction": "恒瑞医药2024年Q3季度实现营业收入50.6亿元,同比下降15.9%。净利润达到1468.1亿元,利润率为9.2%。海外销售增长20.3%,显示出强劲的增长动力。展望未来,持续的成本优化有望推动利润率进一步提升。",
+          "reference": "恒瑞医药2024年Q3季度实现营业收入50.6亿元,同比下滑15.9%。净利润达到1468.1亿元,利润率为9.2%。海外销售增长20.3%,面临一定经营压力。展望未来,成本优化措施有望帮助稳定利润水平。"
         }
       ],
       "hallucination": [
@@ -88,8 +91,15 @@
           "sample_id": 32,
           "task": "fin_summary",
           "input": "阿里巴巴发布了2024年Q4季度业绩报告。报告期内,公司实现营业收入4753.0亿元,同比增长30.2%。归属于上市公司股东的净利润为501.3亿元,营业利润为24.5%。公司核心业务保持稳健增长,但也面临原材料成本上涨等挑战。管理层表示将持续加大研发投入,推动有利的政策环境变化。期间费用率有所优化,经营现金流保持健康水平。",
-          "prediction": "{\"summary\": \"阿里巴巴2024年Q4季度实现营收4753.0亿元,同比增长30.2%。净利润为501.3亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入4753.0亿元,同比增长30.2%\", \"净利润为501.3亿元\", \"营业利润为24.5%\", \"持续加大研发投入\"], \"risks\": [\"原材料成本上涨\"], \"opportunities\": [\"有利的政策环境变化\"]}",
+          "prediction": "{\"summary\": \"阿里巴巴2024年Q4季度实现营收4753.0亿元,同比增长30.2%。净利润为501.3亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入4753.0亿元,同比增长30.2%\", \"净利润501.3亿元\", \"营业利润24.5%\", \"持续加大研发投入\"], \"risks\": [\"原材料成本上涨\"], \"opportunities\": [\"有利的政策环境变化\"]}",
           "reference": "{\"summary\": \"阿里巴巴2024年Q4季度实现营收4753.0亿元,同比增长30.2%。净利润为501.3亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入4753.0亿元,同比增长30.2%\", \"净利润501.3亿元\", \"营业利润为24.5%\", \"持续加大研发投入\"], \"risks\": [\"消费需求放缓\", \"原材料成本上涨\"], \"opportunities\": [\"成本优化带来的利润提升\"]}"
+        },
+        {
+          "sample_id": 36,
+          "task": "fin_summary",
+          "input": "隆基绿能发布了2025年Q3季度业绩报告。报告期内,公司实现营业收入1704.2亿元,同比增长11.3%。归属于上市公司股东的净利润为795.0亿元,营业利润为1.6%。公司核心业务保持稳健增长,但也面临汇率波动风险等挑战。管理层表示将持续加大研发投入,推动AI解决方案需求增长。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "{\"summary\": \"隆基绿能2025年Q3季度实现营收1704.2亿元,同比增长11.3%。净利润为795.0亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入1704.2亿元,同比增长11.3%\", \"净利润795.0亿元\", \"营业利润为1.6%\", \"持续加大研发投入\"], \"risks\": [\"原材料成本上涨压力\", \"汇率波动风险\"], \"opportunities\": [\"AI解决方案需求增长\"]}",
+          "reference": "{\"summary\": \"隆基绿能2025年Q3季度实现营收1704.2亿元,同比增长11.3%。净利润为795.0亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入1704.2亿元,同比增长11.3%\", \"净利润795.0亿元\", \"营业利润为1.6%\", \"持续加大研发投入\"], \"risks\": [\"原材料成本上涨\", \"网络安全威胁\", \"供应链中断风险\"], \"opportunities\": [\"有利的政策环境变化\", \"新产品发布周期\"]}"
         },
         {
           "sample_id": 37,
@@ -105,15 +115,6 @@
           "prediction": "{\"summary\": \"腾讯控股2023年Q2季度实现营收3581.6亿元,同比增长33.1%。净利润为189.7亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入3581.6亿元,同比增长33.1%\", \"净利润为189.7亿元\", \"净利润率为8.3%\", \"持续加大研发投入\"], \"risks\": [\"消费需求放缓\"], \"opportunities\": [\"新兴市场拓展机会\"]}",
           "reference": "{\"summary\": \"腾讯控股2023年Q2季度实现营收3581.6亿元,同比增长33.1%。净利润为189.7亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入3581.6亿元,同比增长33.1%\", \"净利润189.7亿元\", \"净利润为8.3%\", \"持续加大研发投入\"], \"risks\": [\"消费需求放缓\", \"人才流失风险\"], \"opportunities\": [\"新产品发布周期\", \"成本优化带来的利润提升\"]}"
         }
-      ],
-      "format_violation": [
-        {
-          "sample_id": 36,
-          "task": "fin_summary",
-          "input": "隆基绿能发布了2025年Q3季度业绩报告。报告期内,公司实现营业收入1704.2亿元,同比增长11.3%。归属于上市公司股东的净利润为795.0亿元,营业利润为1.6%。公司核心业务保持稳健增长,但也面临汇率波动风险等挑战。管理层表示将持续加大研发投入,推动AI解决方案需求增长。期间费用率有所优化,经营现金流保持健康水平。",
-          "prediction": "{\"summary\": \"隆基绿能2025年Q3季度实现营收1704.2亿元,同比增长11.3%。净利润为795.0亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入1704.2亿元,同比增长11.3%\", \"净利润795.0亿元\", \"营业利润为1.6%\", \"持续加大研发投入\"], \"risks\": [\"原材料成本上涨压力\", \"汇率波动风险\"], \"opportunities\": [\"AI解决方案需求增长\"})",
-          "reference": "{\"summary\": \"隆基绿能2025年Q3季度实现营收1704.2亿元,同比增长11.3%。净利润为795.0亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入1704.2亿元,同比增长11.3%\", \"净利润795.0亿元\", \"营业利润为1.6%\", \"持续加大研发投入\"], \"risks\": [\"原材料成本上涨\", \"网络安全威胁\", \"供应链中断风险\"], \"opportunities\": [\"有利的政策环境变化\", \"新产品发布周期\"]}"
-        }
       ]
     },
     "per_task_errors": {
@@ -121,12 +122,11 @@
         "partial_match": 5
       },
       "event_extraction": {
-        "partial_match": 10
+        "partial_match": 6
       },
       "fin_summary": {
-        "hallucination": 4,
-        "partial_match": 5,
-        "format_violation": 1
+        "hallucination": 5,
+        "partial_match": 5
       }
     }
   }

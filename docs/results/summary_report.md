@@ -1,6 +1,6 @@
 # Domain LLM Studio — Comprehensive Evaluation Report
 
-*Generated: 2026-04-03 12:23:11*
+*Generated: 2026-04-03 13:28:11*
 
 
 ## Qwen2.5-1.5B Results
@@ -55,43 +55,46 @@
 
 ### analysis_gen
 
-| Metric | BASE | TUNED |
-|--------|--------|--------|
-| field_completeness | 0.8333 | 1.0000 |
-| format_compliance | 1.0000 | 1.0000 |
-| schema_match | 0.9167 | 1.0000 |
+| Metric | BASE | PROMPT_ONLY | TUNED |
+|--------|--------|--------|--------|
+| field_completeness | 0.8667 | 0.8000 | 1.0000 |
+| format_compliance | 1.0000 | 1.0000 | 1.0000 |
+| schema_match | 0.9333 | 0.9000 | 1.0000 |
 
 
 ### doc_qa
 
-| Metric | BASE | TUNED |
-|--------|--------|--------|
-| exact_match | 0.9000 | 1.0000 |
-| grounding_rate | 1.0000 | 1.0000 |
-| token_f1 | 0.9750 | 1.0000 |
+| Metric | BASE | PROMPT_ONLY | TUNED |
+|--------|--------|--------|--------|
+| exact_match | 0.8000 | 0.8000 | 1.0000 |
+| grounding_rate | 0.9000 | 1.0000 | 1.0000 |
+| token_f1 | 0.9556 | 0.9556 | 1.0000 |
 
 
 ### event_extraction
 
-| Metric | BASE | TUNED |
-|--------|--------|--------|
-| entity_f1 | 0.0000 | 0.0000 |
-| entity_precision | 0.0000 | 0.0000 |
-| entity_recall | 0.0000 | 0.0000 |
-| event_f1 | 0.0000 | 0.0000 |
-| event_precision | 0.0000 | 0.0000 |
-| event_recall | 0.0000 | 0.0000 |
-| parse_failure_rate | 0.0000 | 0.0000 |
+| Metric | BASE | PROMPT_ONLY | TUNED |
+|--------|--------|--------|--------|
+| entity_f1 | 0.9000 | 0.9333 | 1.0000 |
+| entity_match_rate | 1.0000 | 1.0000 | 1.0000 |
+| entity_precision | 0.8500 | 0.9000 | 1.0000 |
+| entity_recall | 1.0000 | 1.0000 | 1.0000 |
+| event_f1 | 0.0667 | 0.3667 | 0.4000 |
+| event_precision | 0.0500 | 0.3500 | 0.4000 |
+| event_recall | 0.1000 | 0.4000 | 0.4000 |
+| key_presence_rate | 1.0000 | 1.0000 | 1.0000 |
+| parse_failure_rate | 0.0000 | 0.0000 | 0.0000 |
+| partial_field_match | 0.8500 | 0.8833 | 0.9000 |
 
 
 ### fin_summary
 
-| Metric | BASE | TUNED |
-|--------|--------|--------|
-| keypoint_coverage | 0.6499 | 0.7952 |
-| rouge1 | 0.7061 | 0.9161 |
-| rouge2 | 0.5066 | 0.8984 |
-| rougeL | 0.6328 | 0.9161 |
+| Metric | BASE | PROMPT_ONLY | TUNED |
+|--------|--------|--------|--------|
+| keypoint_coverage | 0.6499 | 0.5850 | 0.7927 |
+| rouge1 | 0.7061 | 0.7255 | 0.9165 |
+| rouge2 | 0.5066 | 0.5490 | 0.9002 |
+| rougeL | 0.6328 | 0.6820 | 0.9165 |
 
 
 ## External Benchmark: FinanceBench
@@ -122,6 +125,33 @@
 | exact_match | 0.0000 |
 | grounding_rate | 0.2500 |
 | token_f1 | 0.1585 |
+
+
+### BASE
+
+| Metric | Value |
+|--------|-------|
+| exact_match | 0.0200 |
+| grounding_rate | 0.1800 |
+| token_f1 | 0.1665 |
+
+
+### PROMPT_ONLY
+
+| Metric | Value |
+|--------|-------|
+| exact_match | 0.0133 |
+| grounding_rate | 0.2000 |
+| token_f1 | 0.1332 |
+
+
+### TUNED
+
+| Metric | Value |
+|--------|-------|
+| exact_match | 0.0200 |
+| grounding_rate | 0.3200 |
+| token_f1 | 0.1192 |
 
 
 ## Charts

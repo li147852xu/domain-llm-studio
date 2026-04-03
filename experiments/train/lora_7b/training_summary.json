@@ -1,7 +1,7 @@
 {
   "total_steps": 60,
   "num_epochs": 3.0,
-  "best_metric": 0.26662200689315796,
+  "best_metric": 0.25615939497947693,
   "training_config": {
     "base_model": "models/Qwen2.5-7B-Instruct",
     "adapter_type": "lora",

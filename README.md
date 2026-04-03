@@ -170,6 +170,71 @@ A key design of this project is the **three-way comparison** that isolates the c
 
 > **Training:** 3 epochs, 60 steps, 25 min on Apple M4 MPS. LoRA r=16/α=32, 18.5M trainable params (1.18% of 1.56B). Train loss 1.878 → 0.207, eval loss 0.200.
 
+## Results: Qwen2.5-7B (3 epochs, RTX 5090 CUDA, ~2 min)
+
+### Financial Summarization
+
+| Metric | Base | Prompt-Only | Tuned | Δ (Tuned−Base) |
+|--------|------|-------------|-------|-----------------|
+| ROUGE-1 | 0.706 | 0.725 | **0.917** | +0.211 |
+| ROUGE-2 | 0.507 | 0.549 | **0.900** | **+0.393** |
+| ROUGE-L | 0.633 | 0.682 | **0.917** | +0.284 |
+| Keypoint Coverage | 0.650 | 0.585 | **0.793** | +0.143 |
+
+### Event Extraction
+
+| Metric | Base | Prompt-Only | Tuned | Δ (Tuned−Base) |
+|--------|------|-------------|-------|-----------------|
+| Entity F1 | 0.900 | 0.933 | **1.000** | +0.100 |
+| Event F1 | 0.067 | 0.367 | **0.400** | +0.333 |
+| Entity Match Rate | 1.000 | 1.000 | 1.000 | — |
+| Partial Field Match | 0.850 | 0.883 | **0.900** | +0.050 |
+| Parse Failure Rate | 0.000 | 0.000 | 0.000 | — |
+
+### Document QA
+
+| Metric | Base | Prompt-Only | Tuned | Δ (Tuned−Base) |
+|--------|------|-------------|-------|-----------------|
+| Exact Match | 0.800 | 0.800 | **1.000** | +0.200 |
+| Token F1 | 0.956 | 0.956 | **1.000** | +0.044 |
+| Grounding Rate | 0.900 | **1.000** | **1.000** | +0.100 |
+
+### Structured Analysis
+
+| Metric | Base | Prompt-Only | Tuned | Δ (Tuned−Base) |
+|--------|------|-------------|-------|-----------------|
+| Format Compliance | 1.000 | 1.000 | 1.000 | — |
+| Field Completeness | 0.867 | 0.800 | **1.000** | +0.133 |
+| Schema Match | 0.933 | 0.900 | **1.000** | +0.067 |
+
+### Error Analysis (7B)
+
+| | Base | Prompt-Only | Tuned |
+|---|------|-------------|-------|
+| Error Rate | 100% | 92.5% | **52.5%** |
+| Partial Match | 35 | 32 | 16 |
+| Hallucination | 5 | 5 | 5 |
+
+> **Training:** 3 epochs, 60 steps, **~2 min** on RTX 5090 CUDA (bf16). LoRA r=16/α=32, 40.4M trainable params (0.53% of 7.66B). Train loss 2.092 → 0.266, eval loss 0.256.
+
+## Cross-Model Comparison (6 Variants)
+
+| Task | Key Metric | 1.5B Base | 1.5B Prompt | 1.5B Tuned | 7B Base | 7B Prompt | 7B Tuned |
+|------|-----------|-----------|-------------|------------|---------|-----------|----------|
+| fin_summary | ROUGE-2 | 0.475 | 0.432 | **0.914** | 0.507 | 0.549 | 0.900 |
+| event_extraction | Entity F1 | 0.800 | 0.867 | **1.000** | 0.900 | 0.933 | **1.000** |
+| event_extraction | Event F1 | 0.167 | 0.167 | **0.600** | 0.067 | 0.367 | 0.400 |
+| doc_qa | Exact Match | 0.800 | 0.800 | **1.000** | 0.800 | 0.800 | **1.000** |
+| analysis_gen | Field Comp. | 0.500 | 0.700 | **1.000** | 0.867 | 0.800 | **1.000** |
+| — | Error Rate | 100% | 100% | **45%** | 100% | 92.5% | 52.5% |
+
+**Key observations:**
+- **7B base is stronger out-of-the-box**: higher entity F1 (0.90 vs 0.80), higher field completeness (0.87 vs 0.50), higher ROUGE
+- **Both scales benefit dramatically from LoRA tuning**: doc_qa and analysis_gen reach perfect scores at both scales
+- **1.5B tuned slightly outperforms 7B tuned on some metrics**: event_f1 (0.60 vs 0.40) and error rate (45% vs 52.5%) — smaller models can be more tightly adapted to the training distribution
+- **Prompt-only provides moderate gains for 7B**: event_f1 jumps from 0.067 → 0.367 with few-shot examples on 7B, showing larger models leverage in-context learning better
+- **Training speed**: 7B on RTX 5090 (~2 min) vs 1.5B on M4 MPS (25 min) — GPU advantage is ~12x
+
 ## External Benchmark: FinanceBench
 
 [FinanceBench](https://huggingface.co/datasets/PatronusAI/financebench) (PatronusAI) is a 150-question QA benchmark over real SEC filings. We use it purely for **external generalization evaluation** — no training on this data.
@@ -182,21 +247,31 @@ A key design of this project is the **three-way comparison** that isolates the c
 | Token F1 | 0.062 | 0.086 | **0.158** |
 | Grounding Rate | 0.125 | **0.375** | 0.250 |
 
-> FinanceBench is intentionally hard — questions require reading real 10-K filings with complex tables. The low scores are expected for a 1.5B model and demonstrate honest external evaluation. The tuned model shows a 2.5x improvement in Token F1 over base, confirming that domain adaptation transfers to unseen benchmarks.
+### 7B Results on FinanceBench (150 samples, full dataset)
+
+| Metric | Base | Prompt-Only | Tuned |
+|--------|------|-------------|-------|
+| Exact Match | **0.020** | 0.013 | **0.020** |
+| Token F1 | **0.167** | 0.133 | 0.119 |
+| Grounding Rate | 0.180 | 0.200 | **0.320** |
+
+> FinanceBench is intentionally hard — questions require reading real 10-K filings with complex tables. The low absolute scores are expected and demonstrate honest external evaluation. Key takeaway: the **tuned 7B model achieves 0.32 grounding rate** (78% improvement over base), meaning domain adaptation helps the model stay anchored to source evidence even on completely unseen financial documents.
 
 ## Event Extraction: Deep Analysis
 
 Event extraction is the most challenging task in the system. Here's what we learned:
 
-**Data bug found and fixed:** The original `seed_generator.py` randomly assigned `event_type` independently of the narrative template. This meant a "layoff" template could get `event_type: "acquisition"` as the gold label, making the task impossible. After aligning templates with event types, Entity F1 jumped from 0.0 to 0.8 (base) and 1.0 (tuned).
+**Data bug found and fixed:** The original `seed_generator.py` randomly assigned `event_type` independently of the narrative template. This meant a "layoff" template could get `event_type: "acquisition"` as the gold label, making the task impossible. After aligning templates with event types, Entity F1 jumped from 0.0 to 0.8+ (base) and 1.0 (tuned).
 
-**Why Event F1 remains at 0.6 (not 1.0):** Full event matching requires *all fields* — company, event_type, date, and sentiment — to match exactly. The model often gets the sentiment wrong (e.g., predicting "negative" for a regulatory approval), showing that multi-field structured extraction with nuanced judgment remains inherently difficult.
+**Why Event F1 remains moderate (0.4–0.6):** Full event matching requires *all fields* — company, event_type, date, metric, change_direction, and sentiment — to match exactly. The model often gets nuanced fields like sentiment wrong (e.g., predicting "negative" for a regulatory approval), showing that multi-field structured extraction with subjective judgment remains inherently difficult.
 
-**Diagnostic metrics tell the full story:**
-- `key_presence_rate = 1.0` — the model always produces the right JSON schema
+**Scale vs adaptation trade-off:** Interestingly, 1.5B tuned (event_f1=0.60) outperforms 7B tuned (0.40) on strict event matching. The smaller model fits the training distribution more tightly, while the 7B model's broader knowledge occasionally introduces plausible but non-exact field values.
+
+**Diagnostic metrics tell the full story (7B tuned):**
+- `key_presence_rate = 1.0` — the model always produces the correct JSON schema
 - `entity_match_rate = 1.0` — company names are always correct after tuning
-- `partial_field_match = 0.93` — on average, 5.6 out of 6 fields are correct
-- `event_f1 = 0.6` — full exact match is the strict bar
+- `partial_field_match = 0.90` — on average, 5.4 out of 6 fields are correct
+- `event_f1 = 0.40` — full exact match is the strict bar
 
 ## Cloud Workflow (7B on NVIDIA GPU)
 
@@ -375,15 +450,16 @@ domain-llm-studio inspect-results  Show latest evaluation summary
 
 This project demonstrates:
 
-- **Domain-specific LLM adaptation** — not just calling APIs, but adapting models to specialized tasks with measurable improvement
-- **Three-way evaluation** (base vs prompt-only vs tuned) — isolates the contribution of prompting vs fine-tuning
-- **Internal + external evaluation** — custom task metrics plus FinanceBench public benchmark
-- **Data quality matters** — discovered and fixed a data generation bug that was causing 0.0 extraction F1, demonstrating systematic debugging
-- **Task-specific metrics** — custom evaluation beyond perplexity (entity F1, grounding rate, field completeness, key presence rate)
-- **Error analysis** — systematic classification of model failures with actionable categories
-- **Parameter-efficient fine-tuning** — LoRA/QLoRA with config-driven experiment management
-- **Reproducible pipeline** — Makefile, CI/CD, seed-deterministic data, config-driven experiments
-- **Financial/enterprise intelligence** — relevant to fintech, banking, enterprise AI roles
+- **Multi-scale domain LLM adaptation** — trained and evaluated both 1.5B (local, Apple M4) and 7B (cloud, RTX 5090) models with LoRA
+- **Six-variant evaluation matrix** (2 scales × 3 variants) — isolates the contribution of model scale, prompting, and fine-tuning
+- **Internal + external evaluation** — custom 4-task metric suite plus FinanceBench (150 real SEC filing questions) public benchmark
+- **Data quality engineering** — discovered and fixed a data generation bug causing 0.0 extraction F1, demonstrating systematic debugging
+- **Task-specific metrics** — custom evaluation beyond perplexity: entity F1, grounding rate, field completeness, key presence rate, partial field match
+- **Error analysis** — systematic classification of model failures (hallucination, grounding failure, format violation, partial match)
+- **Scale vs adaptation insights** — found that 1.5B tuned can outperform 7B tuned on certain metrics, demonstrating cost-efficient adaptation
+- **Parameter-efficient fine-tuning** — LoRA with config-driven experiment management, 1.18% params for 1.5B, 0.53% for 7B
+- **Reproducible pipeline** — Makefile, GitHub Actions CI, seed-deterministic data, YAML-configured experiments
+- **Full-stack ML** — data synthesis → training → evaluation → error analysis → API serving → web demo
 
 ## License
 

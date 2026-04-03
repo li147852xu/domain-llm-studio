@@ -1,0 +1,39 @@
+{
+  "benchmark": "financebench",
+  "model_variant": "prompt_only",
+  "model_path": "models/Qwen2.5-7B-Instruct",
+  "adapter_path": null,
+  "num_samples": 150,
+  "metrics": {
+    "exact_match": 0.013333333333333334,
+    "token_f1": 0.13318473518069407,
+    "grounding_rate": 0.2
+  },
+  "predictions_sample": [
+    {
+      "input": "{\"context\": \"{'evidence_text': 'Table of Contents \\\\n3M Company and Subsidiaries\\\\nConsolidated Statement of Cash Flow s\\\\nYears ended December 31\\\\n \\\\n(Millions)\\\\n \\\\n2018\\\\n \\\\n2017\\\\n \\\\n2016\\\\n ",
+      "prediction": "\\\\n \\\\n \\\\n \\\\nAccounts receivable\\\\n \\\\n \\\\n(305) \\\\n \\\\n(245) \\\\n \\\\n(313) \\\\nInventories\\\\n \\\\n \\\\n(509) \\\\n \\\\n(387) \\\\n \\\\n57 \\\\nAccounts payable\\\\n \\\\n \\\\n408 \\\\n \\\\n24 \\\\n \\\\n148 \\\\nAccrued inc",
+      "reference": "{\"answer\": \"$1577.00\", \"evidence_span\": \"$1577.00\"}"
+    },
+    {
+      "input": "{\"context\": \"{'evidence_text': 'Table of Contents \\\\n3M Company and Subsidiaries\\\\nConsolidated Balance Shee t\\\\nAt December 31\\\\n \\\\n \\\\n \\\\nDecember 31,\\\\n \\\\nDecember 31,\\\\n \\\\n(Dollars in millions",
+      "prediction": "\\\\n$\\\\n1,211 \\\\n$\\\\n1,853 \\\\nAccounts payable\\\\n \\\\n \\\\n2,266 \\\\n \\\\n1,945 \\\\nAccrued payroll\\\\n \\\\n \\\\n749 \\\\n \\\\n870 \\\\nAccrued income taxes\\\\n \\\\n \\\\n243 \\\\n \\\\n310 \\\\nOther current liabilities\\\\n ",
+      "reference": "{\"answer\": \"$8.70\", \"evidence_span\": \"$8.70\"}"
+    },
+    {
+      "input": "{\"context\": \"{'evidence_text': '3M Company and Subsidiaries\\\\nConsolidated Statement of Income\\\\nYears ended December 31\\\\n(Millions, except per share amounts)\\\\n2022\\\\n2021\\\\n2020\\\\nNet sales\\\\n$\\\\n3",
+      "prediction": ",685 \\\\n31,954 \\\\nCommitments and contingencies\\\\nStockholders’ equity\\\\nCommon stock, par value $1.00; authorized 1,000,000,000 shares; issued 566,000,000 and 579,000,000 shares at December 31, 2022 ",
+      "reference": "{\"answer\": \"No, the company is managing its CAPEX and Fixed Assets pretty efficiently, which is evident from below key metrics:\\nCAPEX/Revenue Ratio: 5.1%\\nFixed assets/Total Assets: 20%\\nReturn on As"
+    },
+    {
+      "input": "{\"context\": \"{'evidence_text': 'SG&A, measured as a percent of sales, increased in 2022 when compared to the same period last year. SG&A was impacted by increased special item costs for significant\\\\n",
+      "prediction": "{\n  \"answer\": \"The operating margin change for 3M in FY2022 was driven by several factors including increases in cost of sales, selling, general and administrative expenses (SG&A), and research, devel",
+      "reference": "{\"answer\": \"Operating Margin for 3M in FY2022 has decreased by 1.7% primarily due to: \\n-Decrease in gross Margin\\n-mostly one-off charges including Combat Arms Earplugs litigation, impairment related"
+    },
+    {
+      "input": "{\"context\": \"{'evidence_text': 'Worldwide Sales Change \\\\nBy Business Segment\\\\nOrganic sales\\\\nAcquisitions\\\\nDivestitures\\\\nTranslation\\\\nTotal sales change\\\\nSafety and Industrial\\\\n1.0 %\\\\n \\\\n %\\",
+      "prediction": "{\"answer\": \"Consumer\", \"evidence_span\": \"Consumer\\\\n(0.9)\\\\n \\\\n(0.4)\\\\n(2.6)\\\\n(3.9)\"}",
+      "reference": "{\"answer\": \"The consumer segment shrunk by 0.9% organically.\", \"evidence_span\": \"The consumer segment shrunk by 0.9% organically.\"}"
+    }
+  ]
+}
