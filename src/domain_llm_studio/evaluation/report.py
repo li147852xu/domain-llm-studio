@@ -260,7 +260,6 @@ def generate_full_report(results_dir: Path, output_dir: Path) -> None:
 
     for model_size in ["1.5b", "7b"]:
         eval_dir = results_dir / f"eval_{model_size}"
-        comp_dir = results_dir / f"comparison_{model_size}"
 
         if not eval_dir.exists():
             continue
