@@ -26,17 +26,8 @@ def _load_eval_results(eval_dir: Path) -> dict[str, dict]:
     return results
 
 
-def run_comparison(cfg: EvalConfig, output_dir: Path) -> dict:
-    """Generate comparison report across model variants."""
-    eval_dir = Path(cfg.output_dir)
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    results = _load_eval_results(eval_dir)
-    if not results:
-        console.print("[yellow]No evaluation results found. Run 'eval' first.[/yellow]")
-        return {}
-
+def _build_comparison(results: dict[str, dict]) -> dict:
+    """Build comparison data structure from loaded results."""
     models = sorted(results.keys())
     all_tasks = set()
     for r in results.values():
@@ -49,7 +40,6 @@ def run_comparison(cfg: EvalConfig, output_dir: Path) -> dict:
             all_metrics.update(task_metrics.keys())
     all_metrics = sorted(all_metrics)
 
-    # Build comparison tables
     comparison = {}
     for task in all_tasks:
         task_comparison = {}
@@ -64,14 +54,18 @@ def run_comparison(cfg: EvalConfig, output_dir: Path) -> dict:
         if task_comparison:
             comparison[task] = task_comparison
 
-    # Print comparison tables
+    return comparison
+
+
+def _print_comparison(comparison: dict, models: list[str], results: dict) -> None:
+    """Print comparison tables to console."""
     for task, metrics in comparison.items():
         table = Table(title=f"Comparison — {task}")
         table.add_column("Metric", style="cyan")
         for model in models:
             table.add_column(model.upper(), justify="right")
         if len(models) >= 2:
-            table.add_column("Delta", justify="right", style="green")
+            table.add_column("Delta (last-first)", justify="right", style="green")
 
         for metric, values in sorted(metrics.items()):
             row = [metric]
@@ -97,7 +91,6 @@ def run_comparison(cfg: EvalConfig, output_dir: Path) -> dict:
         console.print(table)
         console.print()
 
-    # Error analysis comparison
     error_table = Table(title="Error Analysis Comparison")
     error_table.add_column("Model", style="cyan")
     error_table.add_column("Error Rate", justify="right")
@@ -118,7 +111,25 @@ def run_comparison(cfg: EvalConfig, output_dir: Path) -> dict:
 
     console.print(error_table)
 
-    # Save comparison
+
+def run_comparison_from_dir(eval_dir: Path, output_dir: Path) -> dict:
+    """Generate comparison report from a directory of eval_*.json files."""
+    eval_dir = Path(eval_dir)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    results = _load_eval_results(eval_dir)
+    if not results:
+        console.print("[yellow]No evaluation results found. Run 'eval' first.[/yellow]")
+        return {}
+
+    models = sorted(results.keys())
+    comparison = _build_comparison(results)
+
+    _print_comparison(comparison, models, results)
+
+    from domain_llm_studio.evaluation.report import generate_charts, generate_markdown_report
+
     report = {
         "models": models,
         "comparison": comparison,
@@ -130,5 +141,19 @@ def run_comparison(cfg: EvalConfig, output_dir: Path) -> dict:
     with open(report_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, ensure_ascii=False)
 
+    chart_dir = output_dir / "charts"
+    chart_paths = generate_charts(report, chart_dir)
+    if chart_paths:
+        console.print(f"[green]Charts saved to {chart_dir}/ ({len(chart_paths)} charts)[/green]")
+
+    md_path = output_dir / "report.md"
+    generate_markdown_report(report, md_path)
+    console.print(f"[green]Markdown report saved to {md_path}[/green]")
+
     console.print(f"\n[green]Comparison report saved to {report_path}[/green]")
     return report
+
+
+def run_comparison(cfg: EvalConfig, output_dir: Path) -> dict:
+    """Generate comparison report (legacy interface using EvalConfig)."""
+    return run_comparison_from_dir(Path(cfg.output_dir), output_dir)

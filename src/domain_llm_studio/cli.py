@@ -76,7 +76,7 @@ def train(
 @app.command(name="eval")
 def evaluate(
     config: Path = typer.Option(
-        "configs/eval/default.yaml", help="Evaluation config YAML"
+        ..., help="Evaluation config YAML (e.g. configs/eval/base_1.5b.yaml)"
     ),
 ):
     """Run evaluation on the test set."""
@@ -90,20 +90,22 @@ def evaluate(
 
 @app.command()
 def compare(
-    config: Path = typer.Option(
-        "configs/eval/default.yaml", help="Evaluation config YAML"
+    results_dir: Path = typer.Option(
+        ..., help="Directory containing eval_*.json files (e.g. experiments/eval_1.5b)"
     ),
     output: Path = typer.Option(
-        "experiments/comparison", help="Output directory for comparison report"
+        None, help="Output directory for comparison report (defaults to experiments/comparison_<suffix>)"
     ),
 ):
     """Generate base vs prompt-only vs tuned comparison report."""
-    from domain_llm_studio.config import EvalConfig, load_config
-    from domain_llm_studio.evaluation.comparator import run_comparison
+    from domain_llm_studio.evaluation.comparator import run_comparison_from_dir
 
-    cfg = load_config(EvalConfig, config)
+    if output is None:
+        suffix = results_dir.name.replace("eval_", "")
+        output = Path("experiments") / f"comparison_{suffix}"
+
     console.print("[bold green]Generating comparison report...[/bold green]")
-    run_comparison(cfg, output)
+    run_comparison_from_dir(results_dir, output)
 
 
 @app.command()
@@ -160,7 +162,7 @@ def demo(
     for example in PRESET_EXAMPLES:
         console.rule(f"[bold]{example['task']}[/bold] ({example.get('lang', 'en')})")
         console.print(f"[dim]Input:[/dim] {example['input_text'][:200]}...")
-        for variant in ["base", "tuned"]:
+        for variant in ["base", "prompt_only", "tuned"]:
             result = predictor.predict(
                 task=example["task"],
                 input_text=example["input_text"],
@@ -182,6 +184,74 @@ def inspect_results(
     from domain_llm_studio.evaluation.report import print_latest_summary
 
     print_latest_summary(results_dir)
+
+
+@app.command()
+def benchmark_eval(
+    benchmark: str = typer.Option(
+        "financebench", help="Benchmark name (financebench)"
+    ),
+    model_path: str = typer.Option(
+        ..., help="Base model HF name or path"
+    ),
+    adapter_path: Optional[str] = typer.Option(
+        None, help="Path to LoRA adapter"
+    ),
+    model_variant: str = typer.Option(
+        "base", help="Model variant: base, prompt_only, or tuned"
+    ),
+    num_samples: Optional[int] = typer.Option(
+        None, help="Max samples to evaluate (None = all)"
+    ),
+    output_dir: Path = typer.Option(
+        None, help="Output directory (default: experiments/benchmark/<name>)"
+    ),
+):
+    """Run evaluation on an external public benchmark."""
+    if benchmark != "financebench":
+        console.print(f"[red]Unknown benchmark: {benchmark}. Supported: financebench[/red]")
+        raise typer.Exit(1)
+
+    from domain_llm_studio.benchmark.financebench import (
+        load_financebench,
+        run_financebench_eval,
+        save_benchmark_results,
+    )
+
+    if output_dir is None:
+        output_dir = Path(f"experiments/benchmark/{benchmark}")
+
+    console.print(f"[bold green]Running {benchmark} benchmark ({model_variant})...[/bold green]")
+
+    samples = load_financebench(num_samples=num_samples)
+    console.print(f"Loaded {len(samples)} benchmark samples")
+
+    results = run_financebench_eval(
+        model_path=model_path,
+        adapter_path=adapter_path,
+        model_variant=model_variant,
+        samples=samples,
+    )
+
+    save_benchmark_results(results, output_dir)
+    console.print(f"[green]Benchmark results saved to {output_dir}[/green]")
+
+
+@app.command()
+def generate_report(
+    results_dir: Path = typer.Option(
+        "experiments", help="Root experiments directory"
+    ),
+    output: Path = typer.Option(
+        "docs/results", help="Output directory for report and charts"
+    ),
+):
+    """Generate comprehensive report with charts from all experiment results."""
+    from domain_llm_studio.evaluation.report import generate_full_report
+
+    console.print("[bold green]Generating comprehensive report...[/bold green]")
+    generate_full_report(results_dir, output)
+    console.print(f"[green]Report saved to {output}[/green]")
 
 
 def main():

@@ -1,4 +1,4 @@
-"""Extraction metrics: entity-level and event-level P/R/F1."""
+"""Extraction metrics: entity-level and event-level P/R/F1 + diagnostic metrics."""
 
 from __future__ import annotations
 
@@ -50,17 +50,88 @@ def _precision_recall_f1(pred_set: set, gold_set: set) -> dict[str, float]:
     return {"precision": precision, "recall": recall, "f1": f1}
 
 
+_EXPECTED_KEYS = {"company", "event_type", "date", "metric", "change_direction", "sentiment"}
+
+
+def _compute_key_presence_rate(predictions: list[list[dict] | None]) -> float:
+    """Fraction of samples where prediction contains all expected keys."""
+    if not predictions:
+        return 0.0
+    count = 0
+    for pred_events in predictions:
+        if pred_events is None or not pred_events:
+            continue
+        event = pred_events[0]
+        if _EXPECTED_KEYS.issubset(event.keys()):
+            count += 1
+    return count / len(predictions)
+
+
+def _compute_entity_match_rate(
+    predictions: list[list[dict] | None],
+    references: list[list[dict] | None],
+) -> float:
+    """Fraction of samples where company name matches (case-insensitive substring)."""
+    if not predictions:
+        return 0.0
+    count = 0
+    total = 0
+    for pred_events, ref_events in zip(predictions, references):
+        if ref_events is None:
+            continue
+        total += 1
+        if pred_events is None or not pred_events:
+            continue
+        pred_company = str(pred_events[0].get("company", "")).lower().strip()
+        ref_company = str(ref_events[0].get("company", "")).lower().strip()
+        if pred_company and ref_company and (pred_company in ref_company or ref_company in pred_company):
+            count += 1
+    return count / total if total else 0.0
+
+
+def _compute_partial_field_match(
+    predictions: list[list[dict] | None],
+    references: list[list[dict] | None],
+) -> float:
+    """Average fraction of fields that match per sample."""
+    if not predictions:
+        return 0.0
+    field_ratios = []
+    for pred_events, ref_events in zip(predictions, references):
+        if ref_events is None:
+            continue
+        if pred_events is None or not pred_events:
+            field_ratios.append(0.0)
+            continue
+        pred = pred_events[0]
+        ref = ref_events[0]
+        fields = list(_EXPECTED_KEYS)
+        matched = 0
+        for f in fields:
+            pv = str(pred.get(f, "")).lower().strip()
+            rv = str(ref.get(f, "")).lower().strip()
+            if pv and rv and (pv == rv or pv in rv or rv in pv):
+                matched += 1
+        field_ratios.append(matched / len(fields) if fields else 0.0)
+    return sum(field_ratios) / len(field_ratios) if field_ratios else 0.0
+
+
 def compute_extraction_metrics(
     predictions: list[str], references: list[str]
 ) -> dict[str, float]:
-    """Compute entity-level and event-level extraction metrics."""
+    """Compute entity-level and event-level extraction metrics + diagnostics."""
     entity_scores = {"precision": [], "recall": [], "f1": []}
     event_scores = {"precision": [], "recall": [], "f1": []}
     parse_failures = 0
 
+    parsed_preds: list[list[dict] | None] = []
+    parsed_refs: list[list[dict] | None] = []
+
     for pred_text, ref_text in zip(predictions, references):
         pred_events = _safe_parse_json(pred_text)
         ref_events = _safe_parse_json(ref_text)
+        parsed_preds.append(pred_events)
+        parsed_refs.append(ref_events)
 
         if pred_events is None:
             parse_failures += 1
@@ -91,4 +162,9 @@ def compute_extraction_metrics(
             result[f"{prefix}_{metric}"] = avg
 
     result["parse_failure_rate"] = parse_failures / len(predictions) if predictions else 0.0
+
+    result["key_presence_rate"] = _compute_key_presence_rate(parsed_preds)
+    result["entity_match_rate"] = _compute_entity_match_rate(parsed_preds, parsed_refs)
+    result["partial_field_match"] = _compute_partial_field_match(parsed_preds, parsed_refs)
+
     return result

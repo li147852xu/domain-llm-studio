@@ -49,6 +49,29 @@ class TestSeedGenerator:
             assert "en" in langs
             assert "zh" in langs
 
+    def test_event_extraction_type_matches_template(self):
+        """Verify event_type aligns with the generated text content."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            generate_seed_data(Path(tmpdir), num_samples_per_task=20, seed=123)
+            extraction_file = Path(tmpdir) / "event_extraction.jsonl"
+            assert extraction_file.exists()
+            with open(extraction_file) as fp:
+                for line in fp:
+                    sample = json.loads(line)
+                    events = json.loads(sample["output"])
+                    event_type = events[0]["event_type"]
+                    text = sample["input"].lower()
+                    if "acquisition" in text or "收购" in text:
+                        assert event_type == "acquisition", f"Expected acquisition, got {event_type}"
+                    elif "layoff" in text or "裁员" in text or "workforce" in text or "restructuring" in text:
+                        assert event_type == "layoff", f"Expected layoff, got {event_type}"
+                    elif "partnership" in text or "合作" in text:
+                        assert event_type == "partnership", f"Expected partnership, got {event_type}"
+                    elif "launched" in text or "发布" in text:
+                        assert event_type == "product_launch", f"Expected product_launch, got {event_type}"
+                    elif "regulatory" in text or "监管" in text or "approval" in text or "批准" in text:
+                        assert event_type == "regulatory", f"Expected regulatory, got {event_type}"
+
 
 class TestCleaners:
     def test_normalize_whitespace(self):

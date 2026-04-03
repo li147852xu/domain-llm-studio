@@ -259,9 +259,14 @@ REGULATORS_EN = ["the SEC", "the FDA", "the FTC", "EU regulators"]
 REGULATORS_ZH = ["证监会", "药监局", "银保监会", "工信部"]
 
 
+_TEMPLATE_EVENT_TYPES = ["earnings", "acquisition", "partnership", "layoff", "product_launch", "regulatory"]
+
+
 def _gen_extraction_en(rng: random.Random) -> dict:
     company = rng.choice(COMPANIES_EN)
-    event_type = rng.choice(EVENT_TYPES)
+    template_idx = rng.randrange(len(_EVENT_TEMPLATES_EN))
+    event_type = _TEMPLATE_EVENT_TYPES[template_idx]
+    template = _EVENT_TEMPLATES_EN[template_idx]
     date = _rand_date(rng)
     quarter = rng.choice(QUARTERS)
     year = rng.choice(YEARS)
@@ -273,7 +278,6 @@ def _gen_extraction_en(rng: random.Random) -> dict:
     target = rng.choice([c for c in COMPANIES_EN if c != company])
     partner = rng.choice([c for c in COMPANIES_EN if c != company])
 
-    template = rng.choice(_EVENT_TEMPLATES_EN)
     text = template.format(
         company=company, date=date, quarter=quarter, year=year,
         metric=metric, amount=amount, pct=pct,
@@ -302,7 +306,9 @@ def _gen_extraction_en(rng: random.Random) -> dict:
 
 def _gen_extraction_zh(rng: random.Random) -> dict:
     company = rng.choice(COMPANIES_ZH)
-    event_type = rng.choice(EVENT_TYPES)
+    template_idx = rng.randrange(len(_EVENT_TEMPLATES_ZH))
+    event_type = _TEMPLATE_EVENT_TYPES[template_idx]
+    template = _EVENT_TEMPLATES_ZH[template_idx]
     date = _rand_date(rng)
     quarter = rng.choice(QUARTERS)
     year = rng.choice(YEARS)
@@ -316,7 +322,6 @@ def _gen_extraction_zh(rng: random.Random) -> dict:
     target = rng.choice([c for c in COMPANIES_ZH if c != company])
     partner = rng.choice([c for c in COMPANIES_ZH if c != company])
 
-    template = rng.choice(_EVENT_TEMPLATES_ZH)
     text = template.format(
         company=company, date=date, quarter=quarter, year=year,
         metric=metric, amount=amount, pct=pct,

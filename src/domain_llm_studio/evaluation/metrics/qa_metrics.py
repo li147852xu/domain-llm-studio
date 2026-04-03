@@ -74,6 +74,17 @@ def grounding_score(pred_text: str, context: str) -> float:
     if not check_text:
         return 0.0
 
+    if isinstance(context, list):
+        context = " ".join(str(c) for c in context)
+    context = str(context)
+
+    try:
+        data = json.loads(context)
+        if isinstance(data, dict) and "context" in data:
+            context = str(data["context"])
+    except (json.JSONDecodeError, TypeError, ValueError):
+        pass
+
     return 1.0 if check_text.lower() in context.lower() else 0.0
 
 

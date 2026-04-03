@@ -2,25 +2,29 @@
   "model": "base",
   "model_path": "Qwen/Qwen2.5-1.5B-Instruct",
   "adapter_path": null,
+  "model_variant": "base",
   "per_task": {
     "analysis_gen": {
       "format_compliance": 1.0,
-      "field_completeness": 0.4,
-      "schema_match": 0.7
+      "field_completeness": 0.5,
+      "schema_match": 0.75
     },
     "doc_qa": {
-      "exact_match": 0.9,
-      "token_f1": 0.9545454545454545,
-      "grounding_rate": 1.0
+      "exact_match": 0.8,
+      "token_f1": 0.9166666666666666,
+      "grounding_rate": 0.8
     },
     "event_extraction": {
-      "entity_precision": 0.0,
-      "entity_recall": 0.0,
-      "entity_f1": 0.0,
-      "event_precision": 0.0,
-      "event_recall": 0.0,
-      "event_f1": 0.0,
-      "parse_failure_rate": 0.0
+      "entity_precision": 0.75,
+      "entity_recall": 0.9,
+      "entity_f1": 0.8,
+      "event_precision": 0.15,
+      "event_recall": 0.2,
+      "event_f1": 0.16666666666666666,
+      "parse_failure_rate": 0.0,
+      "key_presence_rate": 1.0,
+      "entity_match_rate": 0.9,
+      "partial_field_match": 0.7166666666666667
     },
     "fin_summary": {
       "rouge1": 0.6581970339418068,
@@ -31,8 +35,8 @@
   },
   "error_analysis": {
     "error_distribution": {
-      "partial_match": 29,
-      "grounding_failure": 1,
+      "partial_match": 28,
+      "grounding_failure": 2,
       "format_violation": 10
     },
     "total_errors": 40,
@@ -43,46 +47,53 @@
         {
           "sample_id": 0,
           "task": "analysis_gen",
-          "input": "{\"company\": \"中国移动\", \"period\": \"2023年Q2季度\", \"revenue\": \"3963.3亿元\", \"yoy_growth\": \"+19.9%\", \"net_income\": \"2525.9亿元\", \"margin\": \"23.5%\", \"segment_highlight\": \"企业服务部门扩张32.8%\"}",
-          "prediction": "In the second quarter of 2023, China Mobile reported revenue of 3963.3亿元, marking a year-over-year growth of +19.9%. This strong performance underscores the company's continued expansion into new markets and services, particularly within its enterprise segment, which saw a notable increase of 32.8%....",
-          "reference": "中国移动2023年Q2季度实现营业收入3963.3亿元,同比增长19.9%。净利润达到2525.9亿元,利润率为23.5%。企业服务部门扩张32.8%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+          "input": "{\"company\": \"海天味业\", \"period\": \"2025年Q3季度\", \"revenue\": \"2716.0亿元\", \"yoy_growth\": \"-17.9%\", \"net_income\": \"2835.7亿元\", \"margin\": \"19.7%\", \"segment_highlight\": \"消费板块收入下降17.2%\"}",
+          "prediction": "In the third quarter of 2025, our flagship brand, 海天味业，实现了总营收2716.0亿元，较去年同期下滑了17.9%，显示出市场环境的挑战。尽管整体业绩有所下滑，但公司仍保持了较高的净利润水平，达2835.7亿元，净利润率稳定在19.7%。值得注意的是，公司的消费板块收入出现了显著下降，同比下降了17.2%，这可能反映了市场需求的变化或竞争加剧的影响。展望未来，我们需密切关注行业动态和消费者行为变化，以调整策略，应对市场的不确定性。",
+          "reference": "海天味业2025年Q3季度实现营业收入2716.0亿元,同比下滑17.9%。净利润达到2835.7亿元,利润率为19.7%。消费板块收入下降17.2%,面临一定经营压力。展望未来,成本优化措施有望帮助稳定利润水平。"
         },
         {
           "sample_id": 1,
           "task": "analysis_gen",
-          "input": "{\"company\": \"NVIDIA Corp.\", \"period\": \"Q1 2025\", \"revenue\": \"$26.4 billion\", \"yoy_growth\": \"-3.6%\", \"net_income\": \"$41.4 billion\", \"margin\": \"26.9%\", \"segment_highlight\": \"Cloud revenue grew 7.1%\"}",
-          "prediction": "In Q1 2025, NVIDIA reported a revenue of $26.4 billion, marking a -3.6% year-over-year decrease from Q1 2024. This decline is primarily attributed to reduced demand in traditional markets such as gaming and automotive sectors. Despite the overall revenue drop, NVIDIA maintained strong profitability,...",
-          "reference": "NVIDIA Corp. reported Q1 2025 revenue of $26.4 billion, representing a 3.6% year-over-year decline. Net income reached $41.4 billion with margins at 26.9%. Cloud revenue grew 7.1%, indicating headwinds in this business line. Looking ahead, cost optimization measures should help stabilize margins in ..."
+          "input": "{\"company\": \"Alphabet Inc.\", \"period\": \"Q4 2023\", \"revenue\": \"$98.1 billion\", \"yoy_growth\": \"+1.5%\", \"net_income\": \"$6.16 billion\", \"margin\": \"14.6%\", \"segment_highlight\": \"International sales increas...",
+          "prediction": "In Q4 2023, Alphabet Inc. reported revenue of $98.1 billion, marking a year-over-year growth of +1.5%. This performance underscores the company's ability to maintain steady growth despite market fluctuations. The net income of $6.16 billion reflects strong profitability, with a margin of 14.6%, indi...",
+          "reference": "Alphabet Inc. reported Q4 2023 revenue of $98.1 billion, representing a 1.5% year-over-year growth. Net income reached $6.16 billion with margins at 14.6%. International sales increased 1.6%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiatives ..."
         },
         {
           "sample_id": 2,
           "task": "analysis_gen",
-          "input": "{\"company\": \"万科A\", \"period\": \"2023年Q3季度\", \"revenue\": \"343.7亿元\", \"yoy_growth\": \"+19.4%\", \"net_income\": \"3598.6亿元\", \"margin\": \"7.7%\", \"segment_highlight\": \"海外销售增长12.2%\"}",
-          "prediction": "In the third quarter of 2023, the performance of万科A was robust, as evidenced by its revenue growth of +19.4%, which is significantly higher than the previous year. This indicates a strong momentum in the company's operations during the quarter. The net income of RMB 359.86 billion further underscore...",
-          "reference": "万科A2023年Q3季度实现营业收入343.7亿元,同比增长19.4%。净利润达到3598.6亿元,利润率为7.7%。海外销售增长12.2%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+          "input": "{\"company\": \"字节跳动\", \"period\": \"2023年Q3季度\", \"revenue\": \"3470.5亿元\", \"yoy_growth\": \"+5.2%\", \"net_income\": \"2253.1亿元\", \"margin\": \"2.3%\", \"segment_highlight\": \"企业服务部门扩张8.3%\"}",
+          "prediction": "In the third quarter of 2023, ByteDance reported robust performance across its diverse portfolio. The total revenue reached 3470.5亿元, marking a year-over-year growth of +5.2%, reflecting strong market traction and strategic expansion efforts. This growth is particularly noteworthy in the enterprise ...",
+          "reference": "字节跳动2023年Q3季度实现营业收入3470.5亿元,同比增长5.2%。净利润达到2253.1亿元,利润率为2.3%。企业服务部门扩张8.3%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
         },
         {
           "sample_id": 3,
           "task": "analysis_gen",
-          "input": "{\"company\": \"Intel Corp.\", \"period\": \"Q3 2023\", \"revenue\": \"$94.1 billion\", \"yoy_growth\": \"+30.9%\", \"net_income\": \"$133.6 billion\", \"margin\": \"28.8%\", \"segment_highlight\": \"International sales increas...",
-          "prediction": "In Q3 2023, Intel Corporation reported robust performance across its international operations, marking a significant increase of 6.6% over the previous quarter. This growth is reflected in both revenue and net income figures, which stood at $94.1 billion and $133.6 billion respectively, showcasing a...",
-          "reference": "Intel Corp. reported Q3 2023 revenue of $94.1 billion, representing a 30.9% year-over-year growth. Net income reached $133.6 billion with margins at 28.8%. International sales increased 6.6%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiatives ..."
+          "input": "{\"company\": \"Netflix Inc.\", \"period\": \"Q2 2023\", \"revenue\": \"$72.4 billion\", \"yoy_growth\": \"+8.1%\", \"net_income\": \"$59.6 billion\", \"margin\": \"20.6%\", \"segment_highlight\": \"Enterprise division expanded...",
+          "prediction": "In Q2 2023, Netflix reported revenue of $72.4 billion, marking a year-over-year growth of +8.1%. This strong performance is driven by robust expansion across its Enterprise division, which grew by 19.1%. The net income of $59.6 billion further underscores the company's profitability, with a margin o...",
+          "reference": "Netflix Inc. reported Q2 2023 revenue of $72.4 billion, representing a 8.1% year-over-year growth. Net income reached $59.6 billion with margins at 20.6%. Enterprise division expanded by 19.1%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiative..."
         },
         {
           "sample_id": 4,
           "task": "analysis_gen",
-          "input": "{\"company\": \"招商银行\", \"period\": \"2023年Q4季度\", \"revenue\": \"4336.3亿元\", \"yoy_growth\": \"+17.9%\", \"net_income\": \"1627.9亿元\", \"margin\": \"16.8%\", \"segment_highlight\": \"海外销售增长26.1%\"}",
-          "prediction": "In the fourth quarter of 2023, our bank achieved robust performance, recording revenue of 4336.3亿元, marking a year-over-year growth of +17.9%. This strong performance is driven by diversified income streams across various segments, including domestic sales which grew by 15.2%, and overseas sales, wh...",
-          "reference": "招商银行2023年Q4季度实现营业收入4336.3亿元,同比增长17.9%。净利润达到1627.9亿元,利润率为16.8%。海外销售增长26.1%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+          "input": "{\"company\": \"建设银行\", \"period\": \"2025年Q2季度\", \"revenue\": \"96.8亿元\", \"yoy_growth\": \"+24.4%\", \"net_income\": \"1780.1亿元\", \"margin\": \"11.6%\", \"segment_highlight\": \"企业服务部门扩张10.7%\"}",
+          "prediction": "In the second quarter of 2025, Construction Bank reported revenue of 96.8 billion yuan, marking a year-over-year growth of +24.4%. This strong performance underscores the bank's ability to maintain robust profitability amidst economic challenges. The net income of 1780.1 billion yuan further solidif...",
+          "reference": "建设银行2025年Q2季度实现营业收入96.8亿元,同比增长24.4%。净利润达到1780.1亿元,利润率为11.6%。企业服务部门扩张10.7%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
         }
       ],
       "grounding_failure": [
         {
-          "sample_id": 10,
+          "sample_id": 17,
           "task": "doc_qa",
-          "input": "Context: On 2024-08-26, Mastercard Inc. announced the appointment of Michael Chen as the new CEO, replacing Michael Chen who served in the role for 9 years. The board cited the need for fresh leadersh...",
-          "prediction": "{\n  \"answer\": \"The leadership change was made due to the need for fresh leadership to navigate the company's expansion into semiconductors.\",\n  \"evidence_span\": \"On 2024-08-26, Mastercard Inc. announced the appointment of Michael Chen as the new CEO, replacing Michael Chen who served in the role for...",
-          "reference": "{\"answer\": \"to navigate the company's expansion into semiconductors\", \"evidence_span\": \"to navigate the company's expansion into semiconductors\"}"
+          "input": "Context: On 2024-12-04, Intel Corp. announced the appointment of Lisa Wang as the new CEO, replacing Lisa Wang who served in the role for 10 years. The board cited the need for fresh leadership to nav...",
+          "prediction": "{\n  \"answer\": \"The leadership change was made due to the need for fresh leadership to navigate the company's expansion into electric vehicles.\",\n  \"evidence_span\": \"On 2024-12-04, Intel Corp. announced the appointment of Lisa Wang as the new CEO, replacing Lisa Wang who served in the role for 10 yea...",
+          "reference": "{\"answer\": \"to navigate the company's expansion into electric vehicles\", \"evidence_span\": \"to navigate the company's expansion into electric vehicles\"}"
+        },
+        {
+          "sample_id": 19,
+          "task": "doc_qa",
+          "input": "Context: On 2025-09-10, Apple Inc. announced the appointment of James Miller as the new CEO, replacing Sarah Johnson who served in the role for 15 years. The board cited the need for fresh leadership ...",
+          "prediction": "{\n  \"answer\": \"The leadership change was made due to the need for fresh leadership to navigate the company's expansion into electric vehicles.\",\n  \"evidence_span\": \"On 2025-09-10, Apple Inc. announced the appointment of James Miller as the new CEO, replacing Sarah Johnson who served in the role for ...",
+          "reference": "{\"answer\": \"to navigate the company's expansion into electric vehicles\", \"evidence_span\": \"to navigate the company's expansion into electric vehicles\"}"
         }
       ],
       "format_violation": [
@@ -128,8 +139,8 @@
         "partial_match": 10
       },
       "doc_qa": {
-        "grounding_failure": 1,
-        "partial_match": 9
+        "partial_match": 8,
+        "grounding_failure": 2
       },
       "event_extraction": {
         "partial_match": 10

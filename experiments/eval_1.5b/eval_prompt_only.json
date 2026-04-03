@@ -1,0 +1,154 @@
+{
+  "model": "prompt_only",
+  "model_path": "Qwen/Qwen2.5-1.5B-Instruct",
+  "adapter_path": null,
+  "model_variant": "prompt_only",
+  "per_task": {
+    "analysis_gen": {
+      "format_compliance": 1.0,
+      "field_completeness": 0.7,
+      "schema_match": 0.85
+    },
+    "doc_qa": {
+      "exact_match": 0.8,
+      "token_f1": 0.8,
+      "grounding_rate": 0.8
+    },
+    "event_extraction": {
+      "entity_precision": 0.8,
+      "entity_recall": 1.0,
+      "entity_f1": 0.8666666666666666,
+      "event_precision": 0.15,
+      "event_recall": 0.2,
+      "event_f1": 0.16666666666666666,
+      "parse_failure_rate": 0.0,
+      "key_presence_rate": 1.0,
+      "entity_match_rate": 1.0,
+      "partial_field_match": 0.6333333333333333
+    },
+    "fin_summary": {
+      "rouge1": 0.6670448904998021,
+      "rouge2": 0.43232861232919106,
+      "rougeL": 0.6283541368090484,
+      "keypoint_coverage": 0.511989020864079
+    }
+  },
+  "error_analysis": {
+    "error_distribution": {
+      "partial_match": 33,
+      "grounding_failure": 2,
+      "hallucination": 5
+    },
+    "total_errors": 40,
+    "total_samples": 40,
+    "error_rate": 1.0,
+    "examples": {
+      "partial_match": [
+        {
+          "sample_id": 0,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"海天味业\", \"period\": \"2025年Q3季度\", \"revenue\": \"2716.0亿元\", \"yoy_growth\": \"-17.9%\", \"net_income\": \"2835.7亿元\", \"margin\": \"19.7%\", \"segment_highlight\": \"消费板块收入下降17.2%\"}",
+          "prediction": "在2025年第三季度，海天味业的总营收达到2716.0亿元人民币，较去年同期下滑了17.9%，显示出市场环境对消费板块的影响。尽管整体营收有所减少，但公司仍实现了2835.7亿元的净利润，毛利率为19.7%。值得注意的是，公司的消费板块收入出现了显著下降，达17.2%。这一数据表明公司在面对外部挑战时，如何通过优化内部运营和提升效率来保持盈利能力的重要性。未来，随着市场的进一步调整，海天味业需要继续关注成本控制和产品创新，以维持其市场份额和利润水平。",
+          "reference": "海天味业2025年Q3季度实现营业收入2716.0亿元,同比下滑17.9%。净利润达到2835.7亿元,利润率为19.7%。消费板块收入下降17.2%,面临一定经营压力。展望未来,成本优化措施有望帮助稳定利润水平。"
+        },
+        {
+          "sample_id": 1,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"Alphabet Inc.\", \"period\": \"Q4 2023\", \"revenue\": \"$98.1 billion\", \"yoy_growth\": \"+1.5%\", \"net_income\": \"$6.16 billion\", \"margin\": \"14.6%\", \"segment_highlight\": \"International sales increas...",
+          "prediction": "In Q4 2023, Alphabet Inc. experienced a modest 1.5% year-over-year growth in revenue to $98.1 billion. Despite this slight decline, net income improved by 14.6%, marking a solid performance despite market challenges. Notably, international sales saw a notable increase of 1.6%. This highlights the co...",
+          "reference": "Alphabet Inc. reported Q4 2023 revenue of $98.1 billion, representing a 1.5% year-over-year growth. Net income reached $6.16 billion with margins at 14.6%. International sales increased 1.6%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiatives ..."
+        },
+        {
+          "sample_id": 2,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"字节跳动\", \"period\": \"2023年Q3季度\", \"revenue\": \"3470.5亿元\", \"yoy_growth\": \"+5.2%\", \"net_income\": \"2253.1亿元\", \"margin\": \"2.3%\", \"segment_highlight\": \"企业服务部门扩张8.3%\"}",
+          "prediction": "在2023年第三季度，字节跳动的总收入达到3470.5亿元人民币，同比增长了5.2%，显示出稳健的增长势头。净利润为2253.1亿元人民币，毛利率稳定在2.3%。值得注意的是，企业服务部门实现了8.3%的扩张速度，这表明公司在这一领域的发展潜力巨大。未来，随着技术和服务的进一步优化，预计公司业绩将继续保持增长态势。",
+          "reference": "字节跳动2023年Q3季度实现营业收入3470.5亿元,同比增长5.2%。净利润达到2253.1亿元,利润率为2.3%。企业服务部门扩张8.3%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+        },
+        {
+          "sample_id": 3,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"Netflix Inc.\", \"period\": \"Q2 2023\", \"revenue\": \"$72.4 billion\", \"yoy_growth\": \"+8.1%\", \"net_income\": \"$59.6 billion\", \"margin\": \"20.6%\", \"segment_highlight\": \"Enterprise division expanded...",
+          "prediction": "In Q2 2023, Netflix reported a revenue of $72.4 billion, marking an 8.1% growth from the previous quarter. This performance is driven by a 19.1% expansion in its Enterprise division. The company's net income was $59.6 billion, demonstrating strong profitability. These figures highlight the effective...",
+          "reference": "Netflix Inc. reported Q2 2023 revenue of $72.4 billion, representing a 8.1% year-over-year growth. Net income reached $59.6 billion with margins at 20.6%. Enterprise division expanded by 19.1%, indicating strong momentum in this business line. Looking ahead, continued investment in growth initiative..."
+        },
+        {
+          "sample_id": 4,
+          "task": "analysis_gen",
+          "input": "{\"company\": \"建设银行\", \"period\": \"2025年Q2季度\", \"revenue\": \"96.8亿元\", \"yoy_growth\": \"+24.4%\", \"net_income\": \"1780.1亿元\", \"margin\": \"11.6%\", \"segment_highlight\": \"企业服务部门扩张10.7%\"}",
+          "prediction": "建设银行在2025年第二季度实现了96.8亿元的收入，同比增长24.4%，展现出强劲的增长势头。净利润达到1780.1亿元，表明公司运营效率显著提升。值得注意的是，企业服务部门在本季度增长了10.7%，显示出其业务扩展和市场竞争力的增强。未来，随着这一趋势的持续，预计公司的盈利能力将进一步提高。",
+          "reference": "建设银行2025年Q2季度实现营业收入96.8亿元,同比增长24.4%。净利润达到1780.1亿元,利润率为11.6%。企业服务部门扩张10.7%,显示出强劲的增长动力。展望未来,持续的增长投入有望推动业绩进一步提升。"
+        }
+      ],
+      "grounding_failure": [
+        {
+          "sample_id": 13,
+          "task": "doc_qa",
+          "input": "Context: 招商银行于2023-11-13公告,任命王芳为公司新任首席执行官,接替任职6年的李明。董事会表示,此次管理层调整旨在推动公司在金融科技领域的战略转型。\n\nQuestion: 李明担任CEO多长时间?",
+          "prediction": "{\"answer\": \"6 years\", \"evidence_span\": \"任命王芳为公司新任首席执行官,接替任职6年的李明\"}",
+          "reference": "{\"answer\": \"6年\", \"evidence_span\": \"6年\"}"
+        },
+        {
+          "sample_id": 15,
+          "task": "doc_qa",
+          "input": "Context: 恒瑞医药于2025-09-17公告,任命李明为公司新任首席执行官,接替任职5年的陈晓华。董事会表示,此次管理层调整旨在推动公司在云计算领域的战略转型。\n\nQuestion: 陈晓华担任CEO多长时间?",
+          "prediction": "{\"answer\": \"5 years\", \"evidence_span\": \"陈晓华任职5年的陈晓华\"}",
+          "reference": "{\"answer\": \"5年\", \"evidence_span\": \"5年\"}"
+        }
+      ],
+      "hallucination": [
+        {
+          "sample_id": 30,
+          "task": "fin_summary",
+          "input": "万科A发布了2025年Q3季度业绩报告。报告期内,公司实现营业收入1479.7亿元,同比下降34.3%。归属于上市公司股东的净利润为3292.9亿元,营业收入为10.7%。公司核心业务保持稳健增长,但也面临消费需求放缓等挑战。管理层表示将持续加大研发投入,推动有利的政策环境变化。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "{\"summary\":\"万科A发布2025年Q3业绩报告，营业收入下降34.3%，净利润率为11.7%。\",\"key_points\":[\"营业收入1479.7亿元\",\"净利润3292.9亿元\",\"营业收入10.7%\"],\"risks\":[\"消费需求放缓\",\"市场竞争加剧\"],\"opportunities\":[\"持续加大研发投入,推动有利的政策环境变化\"]}",
+          "reference": "{\"summary\": \"万科A2025年Q3季度实现营收1479.7亿元,同比下降34.3%。净利润为3292.9亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入1479.7亿元,同比下降34.3%\", \"净利润3292.9亿元\", \"营业收入为10.7%\", \"持续加大研发投入\"], \"risks\": [\"汇率波动风险\", \"消费需求放缓\"], \"opportunities\": [\"AI解决方案需求增长\", \"有利的政策环境变化\"]}"
+        },
+        {
+          "sample_id": 32,
+          "task": "fin_summary",
+          "input": "阿里巴巴发布了2024年Q4季度业绩报告。报告期内,公司实现营业收入4753.0亿元,同比增长30.2%。归属于上市公司股东的净利润为501.3亿元,营业利润为24.5%。公司核心业务保持稳健增长,但也面临原材料成本上涨等挑战。管理层表示将持续加大研发投入,推动有利的政策环境变化。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "{\"summary\":\"阿里巴巴2024年Q4季度实现营业收入4753.0亿元，同比增长30.2%；净利润501.3亿元，营业利润24.5%。\",\"key_points\":[\"营业收入4753.0亿元\",\"同比增长30.2%\",\"净利润501.3亿元\",\"营业利润24.5%\"],\"risks\":[\"原材料成本上涨等挑战\"],\"opportunities\":[\"持续加大研发投入,推动有利的政策环境变化\"]}",
+          "reference": "{\"summary\": \"阿里巴巴2024年Q4季度实现营收4753.0亿元,同比增长30.2%。净利润为501.3亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入4753.0亿元,同比增长30.2%\", \"净利润501.3亿元\", \"营业利润为24.5%\", \"持续加大研发投入\"], \"risks\": [\"消费需求放缓\", \"原材料成本上涨\"], \"opportunities\": [\"成本优化带来的利润提升\"]}"
+        },
+        {
+          "sample_id": 36,
+          "task": "fin_summary",
+          "input": "隆基绿能发布了2025年Q3季度业绩报告。报告期内,公司实现营业收入1704.2亿元,同比增长11.3%。归属于上市公司股东的净利润为795.0亿元,营业利润为1.6%。公司核心业务保持稳健增长,但也面临汇率波动风险等挑战。管理层表示将持续加大研发投入,推动AI解决方案需求增长。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "{\n  \"summary\": \"隆基绿能在2025年第三季度实现了1704.2亿元的营业收入和795.0亿元的净利润，核心业务保持稳健增长，但面临汇率波动的风险。\",\n  \"key_points\": [\n    \"营业收入1704.2亿元\",\n    \"净利润795.0亿元\",\n    \"核心业务稳健增长\"\n  ],\n  \"risks\": [\n    \"汇率波动风险\"\n  ],\n  \"opportunities\": [\n    \"持续加大研发投入，推动AI解决方案需求增长\"\n  ]\n}",
+          "reference": "{\"summary\": \"隆基绿能2025年Q3季度实现营收1704.2亿元,同比增长11.3%。净利润为795.0亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入1704.2亿元,同比增长11.3%\", \"净利润795.0亿元\", \"营业利润为1.6%\", \"持续加大研发投入\"], \"risks\": [\"原材料成本上涨\", \"网络安全威胁\", \"供应链中断风险\"], \"opportunities\": [\"有利的政策环境变化\", \"新产品发布周期\"]}"
+        },
+        {
+          "sample_id": 37,
+          "task": "fin_summary",
+          "input": "招商银行发布了2023年Q3季度业绩报告。报告期内,公司实现营业收入4767.3亿元,同比下降19.7%。归属于上市公司股东的净利润为3933.1亿元,营业收入为18.5%。公司核心业务保持稳健增长,但也面临核心市场竞争加剧等挑战。管理层表示将持续加大研发投入,推动战略合作伙伴关系拓展。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "{\n  \"summary\": \"招商银行发布2023年第三季度业绩报告，营业收入下降19.7%，净利润增长18.5%。\",\n  \"key_points\": [\n    \"营业收入4767.3亿元\",\n    \"净利润3933.1亿元\",\n    \"营业收入同比减少19.7%\",\n    \"净利润同比增长18.5%\"\n  ],\n  \"risks\": [\n    \"核心市场竞争加剧\"\n  ],\n  \"opportunities\": [\n    \"核心业务稳健增长\",\n    \"加大研发投入\",\n    \"推动战略合作伙伴关系拓展\",\n    \"期间费用率优化\",\n    \"经营现金流保持健康水平\"...",
+          "reference": "{\"summary\": \"招商银行2023年Q3季度实现营收4767.3亿元,同比下降19.7%。净利润为3933.1亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入4767.3亿元,同比下降19.7%\", \"净利润3933.1亿元\", \"营业收入为18.5%\", \"持续加大研发投入\"], \"risks\": [\"核心市场竞争加剧\", \"供应链中断风险\"], \"opportunities\": [\"战略合作伙伴关系拓展\", \"有利的政策环境变化\"]}"
+        },
+        {
+          "sample_id": 38,
+          "task": "fin_summary",
+          "input": "腾讯控股发布了2023年Q2季度业绩报告。报告期内,公司实现营业收入3581.6亿元,同比增长33.1%。归属于上市公司股东的净利润为189.7亿元,净利润为8.3%。公司核心业务保持稳健增长,但也面临消费需求放缓等挑战。管理层表示将持续加大研发投入,推动新兴市场拓展机会。期间费用率有所优化,经营现金流保持健康水平。",
+          "prediction": "{\"summary\":\"腾讯控股2023年第二季度实现营业收入3581.6亿元，同比增长33.1%；净利润为189.7亿元，净利润率为8.3%。\",\"key_points\":[\"营业收入3581.6亿元\",\"净利润189.7亿元\",\"净利润率为8.3%\"],\"risks\":[\"消费需求放缓\",\"市场竞争加剧\"],\"opportunities\":[\"持续加大研发投入\",\"推动新兴市场拓展\"]}",
+          "reference": "{\"summary\": \"腾讯控股2023年Q2季度实现营收3581.6亿元,同比增长33.1%。净利润为189.7亿元。公司核心业务表现稳健。\", \"key_points\": [\"营业收入3581.6亿元,同比增长33.1%\", \"净利润189.7亿元\", \"净利润为8.3%\", \"持续加大研发投入\"], \"risks\": [\"消费需求放缓\", \"人才流失风险\"], \"opportunities\": [\"新产品发布周期\", \"成本优化带来的利润提升\"]}"
+        }
+      ]
+    },
+    "per_task_errors": {
+      "analysis_gen": {
+        "partial_match": 10
+      },
+      "doc_qa": {
+        "partial_match": 8,
+        "grounding_failure": 2
+      },
+      "event_extraction": {
+        "partial_match": 10
+      },
+      "fin_summary": {
+        "hallucination": 5,
+        "partial_match": 5
+      }
+    }
+  }
+}

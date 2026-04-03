@@ -64,6 +64,25 @@ class TestExtractionMetrics:
         assert m["parse_failure_rate"] == 1.0
         assert m["entity_f1"] == 0.0
 
+    def test_soft_metrics_perfect(self):
+        events = [{"company": "Apple", "event_type": "earnings", "date": "2024-01-01",
+                    "metric": "revenue", "change_direction": "increase", "sentiment": "positive"}]
+        pred = json.dumps(events)
+        ref = json.dumps(events)
+        m = compute_extraction_metrics([pred], [ref])
+        assert m["key_presence_rate"] == 1.0
+        assert m["entity_match_rate"] == 1.0
+        assert m["partial_field_match"] == 1.0
+
+    def test_soft_metrics_partial(self):
+        ref = [{"company": "Apple", "event_type": "earnings", "date": "2024-01-01",
+                "metric": "revenue", "change_direction": "increase", "sentiment": "positive"}]
+        pred = [{"company": "Apple", "event_type": "acquisition", "date": "2024-01-01",
+                 "metric": "wrong", "change_direction": "decrease", "sentiment": "positive"}]
+        m = compute_extraction_metrics([json.dumps(pred)], [json.dumps(ref)])
+        assert m["entity_match_rate"] == 1.0
+        assert 0.0 < m["partial_field_match"] < 1.0
+
 
 class TestGenerationMetrics:
     def test_format_compliance(self):

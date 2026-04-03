@@ -1,0 +1,13 @@
+model_path: "models/Qwen2.5-7B-Instruct"
+adapter_path: null
+model_variant: "prompt_only"
+data_dir: "data/processed"
+output_dir: "experiments/eval_7b"
+tasks:
+  - "fin_summary"
+  - "event_extraction"
+  - "doc_qa"
+  - "analysis_gen"
+num_samples: null
+batch_size: 1
+seed: 42

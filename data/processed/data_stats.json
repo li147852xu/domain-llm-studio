@@ -10,31 +10,31 @@
     "zh": 200,
     "en": 200
   },
-  "avg_input_len": 218.835,
-  "avg_output_len": 197.7725,
+  "avg_input_len": 219.34,
+  "avg_output_len": 197.9025,
   "max_input_len": 592,
   "max_output_len": 538,
   "task_details": {
     "analysis_gen": {
       "count": 100,
-      "avg_input_len": 188.38,
-      "avg_output_len": 227.38,
+      "avg_input_len": 188.58,
+      "avg_output_len": 227.42,
       "max_input_len": 216,
       "max_output_len": 363
     },
     "doc_qa": {
       "count": 100,
-      "avg_input_len": 230.53,
-      "avg_output_len": 64.58,
+      "avg_input_len": 230.92,
+      "avg_output_len": 66.16,
       "max_input_len": 377,
       "max_output_len": 151
     },
     "event_extraction": {
       "count": 100,
-      "avg_input_len": 87.42,
-      "avg_output_len": 145.02,
-      "max_input_len": 180,
-      "max_output_len": 165
+      "avg_input_len": 88.85,
+      "avg_output_len": 143.92,
+      "max_input_len": 178,
+      "max_output_len": 167
     },
     "fin_summary": {
       "count": 100,

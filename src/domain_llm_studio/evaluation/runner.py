@@ -24,12 +24,27 @@ logger = logging.getLogger(__name__)
 console = Console()
 
 
+def _get_few_shot_examples(task: str, lang: str) -> list[dict]:
+    """Retrieve few-shot examples for prompt_only variant."""
+    from domain_llm_studio.inference.predictor import FEW_SHOT_EXAMPLES
+
+    examples = FEW_SHOT_EXAMPLES.get(task, {}).get(lang, [])
+    if not examples:
+        examples = FEW_SHOT_EXAMPLES.get(task, {}).get("en", [])
+    return examples
+
+
+def _detect_lang(text: str) -> str:
+    return "zh" if any("\u4e00" <= c <= "\u9fff" for c in text) else "en"
+
+
 def _run_inference_batch(
     model,
     tokenizer,
     samples: list[dict],
     max_new_tokens: int = 512,
     device: str = "mps",
+    model_variant: str = "base",
 ) -> list[str]:
     """Run inference on a batch of samples."""
     import torch
@@ -38,8 +53,17 @@ def _run_inference_batch(
     for sample in samples:
         messages = [
             {"role": "system", "content": sample.get("instruction", "")},
-            {"role": "user", "content": sample.get("input", "")},
         ]
+
+        if model_variant == "prompt_only":
+            task = sample.get("task", "")
+            lang = _detect_lang(sample.get("input", ""))
+            for ex in _get_few_shot_examples(task, lang):
+                messages.append({"role": "user", "content": ex["input"]})
+                messages.append({"role": "assistant", "content": ex["output"]})
+
+        messages.append({"role": "user", "content": sample.get("input", "")})
+
         text = tokenizer.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
         )
@@ -108,15 +132,17 @@ def run_evaluation(cfg: EvalConfig) -> dict:
 
     tokenizer = load_tokenizer(cfg.model_path)
 
+    model_variant = getattr(cfg, "model_variant", "base")
+
     if cfg.adapter_path:
         model = load_model_with_adapter(cfg.model_path, cfg.adapter_path)
         model_label = "tuned"
     else:
         model = load_base_model(cfg.model_path)
-        model_label = "base"
+        model_label = model_variant if model_variant != "tuned" else "base"
 
     model.eval()
-    console.print(f"Model loaded: {model_label}")
+    console.print(f"Model loaded: {model_label} (variant={model_variant})")
 
     by_task: dict[str, list[dict]] = defaultdict(list)
     for s in test_samples:
@@ -134,7 +160,9 @@ def run_evaluation(cfg: EvalConfig) -> dict:
             continue
 
         console.print(f"\n[bold cyan]Evaluating {task_name}[/bold cyan] ({len(task_samples)} samples)...")
-        predictions = _run_inference_batch(model, tokenizer, task_samples)
+        predictions = _run_inference_batch(
+            model, tokenizer, task_samples, model_variant=model_variant
+        )
         references = [s["output"] for s in task_samples]
         inputs = [s["input"] for s in task_samples]
 
@@ -148,7 +176,6 @@ def run_evaluation(cfg: EvalConfig) -> dict:
 
         console.print(f"  Metrics: {json.dumps(metrics, indent=2)}")
 
-    # Error analysis
     console.print("\n[bold cyan]Running error analysis...[/bold cyan]")
     error_report = analyze_errors(all_predictions, all_references, all_inputs, all_tasks)
     console.print(f"  Error rate: {error_report['error_rate']:.1%}")
@@ -158,6 +185,7 @@ def run_evaluation(cfg: EvalConfig) -> dict:
         "model": model_label,
         "model_path": cfg.model_path,
         "adapter_path": cfg.adapter_path,
+        "model_variant": model_variant,
         "per_task": all_results,
         "error_analysis": error_report,
     }

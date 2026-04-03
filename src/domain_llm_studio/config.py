@@ -102,6 +102,7 @@ class TrainConfig(BaseModel):
 class EvalConfig(BaseModel):
     model_path: str = "Qwen/Qwen2.5-1.5B-Instruct"
     adapter_path: str | None = None
+    model_variant: str = "base"
     data_dir: Path = Path("data/processed")
     output_dir: Path = Path("experiments/eval")
     tasks: list[TaskType] = Field(

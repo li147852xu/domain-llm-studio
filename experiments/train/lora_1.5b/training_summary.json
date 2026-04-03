@@ -1,7 +1,7 @@
 {
   "total_steps": 60,
   "num_epochs": 3.0,
-  "best_metric": 0.20777158439159393,
+  "best_metric": 0.20026449859142303,
   "training_config": {
     "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
     "adapter_type": "lora",
@@ -27,10 +27,5 @@
     "bf16": true,
     "seed": 42,
     "device_map": "auto"
-  },
-  "final_train_loss": 0.6294,
-  "final_eval_loss": 0.2078,
-  "final_train_accuracy": 0.932,
-  "final_eval_accuracy": 0.931,
-  "train_runtime_seconds": 1527
+  }
 }
