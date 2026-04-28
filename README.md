@@ -381,6 +381,26 @@ Features: task selector, model variant selector (base/prompt-only/tuned), 8 bili
 uv run domain-llm-studio demo  # Runs all preset examples through base + prompt_only + tuned
 ```
 
+## Inference Backend Comparison
+
+The system ships with **two interchangeable inference backends** behind a single
+`create_predictor(backend=...)` factory:
+
+- `transformers` — eager `model.generate`, single request per call (default,
+  best for development and small-scale evaluation)
+- `vllm` — paged-attention KV cache + continuous batching (production serving)
+
+Benchmark on RTX 5090 (32 GB), bf16, greedy decoding, 50 samples per task across
+4 financial tasks (`fin_summary` / `event_extraction` / `doc_qa` / `analysis_gen`):
+
+<!-- BENCHMARK_TABLE_START -->
+_Numbers will be filled by `scripts/benchmark_inference.py`. Run:_
+```bash
+python scripts/benchmark_inference.py --models 1.5b,7b --backends transformers,vllm --num-samples 50
+```
+_then re-render this section from `experiments/inference_benchmark/summary.md`._
+<!-- BENCHMARK_TABLE_END -->
+
 ## Project Structure
 
 ```
@@ -426,7 +446,7 @@ domain-llm-studio/
 | **Model** | Qwen2.5-1.5B/7B-Instruct |
 | **Training** | PyTorch, Transformers, PEFT (LoRA/QLoRA), TRL (SFTTrainer) |
 | **Evaluation** | rouge-score, custom task metrics, FinanceBench |
-| **Serving** | FastAPI, Uvicorn, Gradio |
+| **Serving** | FastAPI, Uvicorn, Gradio, vLLM (paged-attention KV cache) |
 | **Infrastructure** | Pydantic v2, Typer, Rich, Matplotlib |
 | **Dev** | uv, pytest, ruff, GitHub Actions CI |
 

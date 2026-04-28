@@ -39,6 +39,9 @@ uv.lock
 *.log
 .DS_Store
 
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
 # NOTE: The following lightweight result files ARE committed:
 #   experiments/train/*/training_log.json
 #   experiments/train/*/training_summary.json

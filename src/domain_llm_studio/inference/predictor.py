@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import json
 import logging
+from typing import Literal
 
 import torch
 
 from domain_llm_studio.data.formatters import TASK_INSTRUCTIONS
 
 logger = logging.getLogger(__name__)
+
+InferenceBackend = Literal["transformers", "vllm"]
 
 FEW_SHOT_EXAMPLES = {
     "fin_summary": {
@@ -164,3 +167,44 @@ class DomainPredictor:
             except Exception as e:
                 results[variant] = f"Error: {e}"
         return results
+
+    def build_prompt(
+        self,
+        task: str,
+        input_text: str,
+        model_type: str = "base",
+        question: str | None = None,
+    ) -> str:
+        """Public alias for prompt construction (used by benchmark)."""
+        return self._build_prompt(task, input_text, model_type, question)
+
+
+def create_predictor(
+    model_path: str,
+    adapter_path: str | None = None,
+    backend: InferenceBackend = "transformers",
+    max_new_tokens: int = 512,
+    **vllm_kwargs,
+):
+    """Factory: return a predictor instance for the requested backend.
+
+    Args:
+        backend: ``"transformers"`` (default, eager generation via HF) or
+            ``"vllm"`` (paged-attention server class). Falling back to
+            transformers if vLLM is unavailable raises a clear ImportError.
+        vllm_kwargs: extra kwargs forwarded to :class:`VllmPredictor`
+            (``max_model_len``, ``gpu_memory_utilization``, ``dtype``).
+    """
+    if backend == "vllm":
+        from domain_llm_studio.inference.vllm_backend import VllmPredictor
+        return VllmPredictor(
+            model_path=model_path,
+            adapter_path=adapter_path,
+            max_new_tokens=max_new_tokens,
+            **vllm_kwargs,
+        )
+    return DomainPredictor(
+        model_path=model_path,
+        adapter_path=adapter_path,
+        max_new_tokens=max_new_tokens,
+    )
