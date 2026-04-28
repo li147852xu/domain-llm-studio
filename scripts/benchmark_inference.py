@@ -127,11 +127,7 @@ def run_transformers(
 
     total_seconds = time.perf_counter() - t_start
 
-    peak_mem_gb = (
-        torch.cuda.max_memory_allocated() / (1024**3)
-        if torch.cuda.is_available()
-        else 0.0
-    )
+    peak_mem_gb = _read_gpu_used_gb()
 
     del predictor
     gc.collect()
@@ -144,6 +140,21 @@ def run_transformers(
         "total_output_tokens": total_output_tokens,
         "peak_mem_gb": peak_mem_gb,
     }
+
+
+def _read_gpu_used_gb() -> float:
+    """Return device-level used GPU memory in GiB.
+
+    Uses ``torch.cuda.mem_get_info`` which reflects the *device's* actual
+    used memory (including vLLM's internal pool, CUDA graphs, and KV
+    cache), unlike ``torch.cuda.max_memory_allocated`` which only tracks
+    PyTorch-allocated tensors.
+    """
+    if not torch.cuda.is_available():
+        return 0.0
+    torch.cuda.synchronize()
+    free, total = torch.cuda.mem_get_info()
+    return (total - free) / (1024**3)
 
 
 def run_vllm(
@@ -186,11 +197,7 @@ def run_vllm(
 
     total_seconds = time.perf_counter() - t_start
 
-    peak_mem_gb = (
-        torch.cuda.max_memory_allocated() / (1024**3)
-        if torch.cuda.is_available()
-        else 0.0
-    )
+    peak_mem_gb = _read_gpu_used_gb()
 
     if hasattr(predictor, "_llm"):
         try:
