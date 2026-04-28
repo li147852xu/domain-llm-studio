@@ -517,6 +517,58 @@ make eval-dpo-7b
 make compare-7b-dpo            # 4-variant base / prompt_only / SFT / DPO
 ```
 
+## 数据飞轮(与 ResearchOps 联动)
+
+A finance LLM that gets retrained on **the kind of research a real analyst
+just produced** is worth more than one trained on synthetic seed data.
+This project ships an importer that converts research artifacts from
+[**ResearchOps**](https://github.com/li147852xu/researchops-ai) — an agent
+that produces grounded research reports from a question + sources — into
+the exact 4-task SFT schema the studio uses.
+
+```
+┌─────────────────────────────┐    ┌────────────────────────────────────┐
+│ ResearchOps run/<run_id>/   │    │ data/processed/from_researchops/   │
+│   plan.json (questions)     │    │   train.jsonl                      │
+│   sources.jsonl (events)    │ →  │   dev.jsonl                        │
+│   report.md (numeric facts) │    │   test.jsonl                       │
+│   evidence_map.json (q→ev)  │    │     × 4 task types each            │
+└─────────────────────────────┘    └────────────────────────────────────┘
+                  │                                 │
+                  └─────────── importer ────────────┘
+                            │
+                            ▼
+            domain-llm-studio build-data \
+              --merge-from-researchops <path>
+                            │
+                            ▼
+              SFT (or DPO) on enlarged data → improved model
+                            │
+                            └─→ next research run uses it
+                                       (the flywheel)
+```
+
+The mapping is direct:
+
+| Source artifact | Target task |
+|---|---|
+| `report.md` paragraphs with numeric facts | `fin_summary` (input=paragraph, output=`{summary,key_points,...}`) |
+| `sources.jsonl` event-tagged entries | `event_extraction` (input=body, output=event array) |
+| `plan.json` questions + `evidence_map.json` | `doc_qa` (input=`{context,question}`, output=`{answer,evidence_span}`) |
+| `report.md` numeric paragraphs + `plan.json` company/period | `analysis_gen` (input=structured numbers, output=memo paragraph) |
+
+Try it end-to-end on the bundled fixture (toy scale, ~5 min on RTX 5090):
+
+```bash
+python scripts/demo_data_flywheel.py
+# → experiments/flywheel_demo/summary.md
+```
+
+If a run is missing one of the source files, that task type is silently
+skipped — partial runs still contribute whatever they can. See
+[`tests/test_researchops_importer.py`](tests/test_researchops_importer.py)
+for the contract (7 tests covering full / partial / zh / I/O schemas).
+
 ## Project Structure
 
 ```

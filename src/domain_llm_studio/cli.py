@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Optional
 
@@ -31,6 +32,11 @@ def build_data(
     num_samples: int = typer.Option(
         50, help="Number of seed samples per task"
     ),
+    merge_from_researchops: Optional[Path] = typer.Option(
+        None,
+        help="Optional ResearchOps imported dir (each split jsonl is appended "
+        "to the corresponding split). See `import-researchops` first.",
+    ),
 ):
     """Build and clean instruction-tuning dataset."""
     from domain_llm_studio.data.builder import build_all
@@ -42,7 +48,49 @@ def build_data(
         seed_only=seed_only,
         num_samples=num_samples,
     )
+
+    if merge_from_researchops is not None:
+        from domain_llm_studio.data.researchops_importer import (
+            _read_jsonl as _ro_read,
+        )
+        merged_total = 0
+        for split in ("train", "dev", "test"):
+            ro_path = Path(merge_from_researchops) / f"{split}.jsonl"
+            if not ro_path.exists():
+                continue
+            extra = _ro_read(ro_path)
+            tgt = Path(output_dir) / f"{split}.jsonl"
+            with open(tgt, "a", encoding="utf-8") as f:
+                for r in extra:
+                    f.write(json.dumps(r, ensure_ascii=False) + "\n")
+            merged_total += len(extra)
+            console.print(
+                f"  Merged {len(extra)} ResearchOps samples → {tgt}"
+            )
+        console.print(
+            f"[green]ResearchOps flywheel: +{merged_total} extra samples[/green]"
+        )
+
     console.print("[bold green]Dataset built successfully.[/bold green]")
+
+
+@app.command(name="import-researchops")
+def import_researchops_cmd(
+    runs_dir: Path = typer.Option(..., help="ResearchOps runs/ directory"),
+    output: Path = typer.Option(
+        "data/processed/from_researchops",
+        help="Output directory for the imported 4-task split jsonl files",
+    ),
+    seed: int = typer.Option(42, help="Random seed for stratified split"),
+):
+    """Convert ResearchOps research runs into 4-task SFT samples."""
+    from domain_llm_studio.data.researchops_importer import import_runs
+
+    counts = import_runs(runs_dir=runs_dir, output_dir=output, seed=seed)
+    console.print(
+        f"[green]Imported: train={counts['train']} / "
+        f"dev={counts['dev']} / test={counts['test']}[/green]"
+    )
 
 
 @app.command()

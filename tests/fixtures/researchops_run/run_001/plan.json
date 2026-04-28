@@ -1,0 +1,9 @@
+{
+  "company": "Acme Corp",
+  "subject": "Acme Corp",
+  "period": "Q3 2024",
+  "questions": [
+    {"id": "q1", "text": "What was Acme Corp Q3 2024 revenue?"},
+    {"id": "q2", "text": "How did the AI segment perform vs prior year?"}
+  ]
+}

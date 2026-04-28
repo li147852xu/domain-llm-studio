@@ -1,0 +1,12 @@
+{
+  "q1": {
+    "answer": "$12.4 billion",
+    "evidence": "Acme Corp reported Q3 2024 revenue of $12.4 billion, up 18% year-over-year",
+    "source_url": "https://example.com/acme-q3-2024"
+  },
+  "q2": {
+    "answer": "AI segment revenue doubled year-over-year to $3.1 billion in Q3 2024",
+    "evidence": "AI segment revenue grew to $3.1 billion, doubling year-over-year, and now represents 25% of total revenue",
+    "source_url": "https://example.com/acme-ai"
+  }
+}
