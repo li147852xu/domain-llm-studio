@@ -136,7 +136,11 @@ def run_evaluation(cfg: EvalConfig) -> dict:
 
     if cfg.adapter_path:
         model = load_model_with_adapter(cfg.model_path, cfg.adapter_path)
-        model_label = "tuned"
+        # Use the variant name verbatim when an adapter is present so that
+        # SFT (variant="tuned") and DPO (variant="dpo_tuned") produce
+        # distinct eval_<label>.json files in the same output_dir, which
+        # is what the comparator's 4-variant view expects.
+        model_label = model_variant if model_variant else "tuned"
     else:
         model = load_base_model(cfg.model_path)
         model_label = model_variant if model_variant != "tuned" else "base"

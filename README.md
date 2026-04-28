@@ -425,6 +425,37 @@ Notes:
 
 <!-- BENCHMARK_TABLE_END -->
 
+## DPO Post-Training
+
+After SFT brings the model into the right output format, **Direct Preference
+Optimization (DPO)** further sharpens behavior by learning from
+preference pairs `(prompt, chosen, rejected)`. The pipeline:
+
+1. **Build preference pairs** ([`preference_pairs.py`](src/domain_llm_studio/data/preference_pairs.py)):
+   for each training prompt, generate one completion from the **base** model
+   and one from the **SFT-tuned** model, score both with ROUGE-L vs the gold
+   reference, and label the higher-scoring one as `chosen`. Ties are dropped.
+2. **Merge SFT adapter into base** via `peft.merge_and_unload()` so DPO
+   starts from the SFT policy without needing two LoRA adapters loaded
+   simultaneously.
+3. **Train a fresh LoRA on top** with `trl.DPOTrainer` (β = 0.1, lr = 5e-7,
+   3 epochs); the implicit reward is `log p_policy(y) - log p_ref(y)`
+   where `p_ref` is the SFT-merged model with frozen weights.
+4. **4-variant evaluation** on the same held-out test set:
+   `base` vs `prompt_only` vs `tuned` (SFT) vs `dpo_tuned` (SFT + DPO).
+
+<!-- DPO_RESULTS_START -->
+_Results will be filled by `make eval-dpo-7b && make compare-7b-dpo`. The
+comparison report lives at `experiments/comparison_7b_dpo/`._
+<!-- DPO_RESULTS_END -->
+
+```bash
+make build-preference-pairs    # ~15-30 min on RTX 5090 (uses 7B model)
+make train-dpo-7b              # ~10-25 min
+make eval-dpo-7b
+make compare-7b-dpo            # 4-variant base / prompt_only / SFT / DPO
+```
+
 ## Project Structure
 
 ```

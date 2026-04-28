@@ -73,6 +73,25 @@ def train(
     run_training(cfg)
 
 
+@app.command()
+def dpo(
+    config: Path = typer.Option(
+        "configs/training/dpo_7b_cloud.yaml",
+        help="DPO training config YAML",
+    ),
+):
+    """Run Direct Preference Optimization on top of an SFT LoRA adapter."""
+    from domain_llm_studio.config import DpoConfig, load_config
+    from domain_llm_studio.training.dpo_trainer import run_dpo
+
+    cfg = load_config(DpoConfig, config)
+    console.print(
+        f"[bold green]Starting DPO from base={cfg.base_model} "
+        f"+ SFT adapter={cfg.sft_adapter_path}[/bold green]"
+    )
+    run_dpo(cfg)
+
+
 @app.command(name="eval")
 def evaluate(
     config: Path = typer.Option(

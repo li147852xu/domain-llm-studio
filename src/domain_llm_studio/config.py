@@ -96,6 +96,40 @@ class TrainConfig(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# DPO Configuration
+# ---------------------------------------------------------------------------
+
+class DpoConfig(BaseModel):
+    """Direct Preference Optimization (post-SFT) training config.
+
+    The default flow merges the existing SFT LoRA adapter into the base
+    model (``merge_and_unload``) and starts a fresh LoRA on top, so the DPO
+    objective sees a strong initialization while still training only a
+    small set of parameters.
+    """
+
+    base_model: str = "Qwen/Qwen2.5-7B-Instruct"
+    sft_adapter_path: str | None = None
+    data_dir: Path = Path("data/processed/preference")
+    output_dir: Path = Path("experiments/train/dpo_7b")
+    lora: LoraConfig = Field(default_factory=LoraConfig)
+    beta: float = 0.1
+    learning_rate: float = 5e-7
+    num_epochs: int = 3
+    per_device_batch_size: int = 2
+    gradient_accumulation_steps: int = 4
+    warmup_ratio: float = 0.05
+    max_prompt_length: int = 1024
+    max_length: int = 1536
+    logging_steps: int = 5
+    eval_steps: int = 25
+    save_steps: int = 50
+    bf16: bool = True
+    seed: int = 42
+    device_map: str = "auto"
+
+
+# ---------------------------------------------------------------------------
 # Evaluation Configuration
 # ---------------------------------------------------------------------------
 
