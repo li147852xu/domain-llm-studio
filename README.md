@@ -1,8 +1,9 @@
 # Domain LLM Adaptation & Evaluation Studio
 
-**A reproducible system for adapting open-source LLMs to domain-specific tasks such as financial and enterprise document understanding, information extraction, and structured summarization.**
+**面向金融文档智能的开源 LLM 端到端适配系统:数据构造 → SFT/DPO 训练 → 4-variant 评估 → vLLM 服务化,在 RTX 5090 上完整跑通。**
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/downloads/)
+[![Domain](https://img.shields.io/badge/domain-finance-blueviolet)](#金融场景设计决策)
 [![CI](https://github.com/li147852xu/domain-llm-studio/actions/workflows/ci.yml/badge.svg)](https://github.com/li147852xu/domain-llm-studio/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-34%20passed-brightgreen)]()
@@ -11,34 +12,60 @@
 
 ## Why This Project?
 
-Large language models excel at general tasks, but domain-specific applications — financial analysis, enterprise document processing, compliance review — demand models that understand specialized terminology, follow strict output formats, and produce verifiable results.
+通用 LLM 在金融场景下有 **三个独特、且都可量化** 的硬要求:
 
-This project demonstrates the **complete lifecycle** of adapting an open-source LLM to domain tasks:
+1. **术语理解** — "息税前利润 / EBITDA / 同店销售 / Yoy 内生增长 / 表外负债" 这类术语既不能字面翻译也不能 hallucinate,必须靠领域语料 SFT 调对。
+2. **严格输出格式** — 摘要必须是合法 JSON、事件抽取必须是 schema 完整的对象数组、QA 必须给出可定位的 `evidence_span`。下游会直接解析,字段缺一个都报错。
+3. **可验证 grounding** — 财务问答和披露摘要不能只看表面流畅度;必须能在原文件里指回证据、并能在 OOD benchmark (FinanceBench) 上不崩。
+
+本项目就是围绕这三条做的端到端实验台,每一步都跟金融场景的实际痛点直接挂钩:
 
 ```
-Data Construction → PEFT Fine-Tuning → Prompt-only vs Tuned Eval → External Benchmark → Error Analysis → Serving
+金融语料种子 → 4-task SFT → DPO 偏好对齐 → 4-variant 严格评测 → FinanceBench OOD → vLLM 服务化
 ```
 
-It is designed to complement agent/workflow platform projects by showing depth in the **model adaptation layer** — not just calling APIs, but understanding how to make models work better for specific domains.
+它跟 agent / workflow 平台类项目互补:那些在 **如何编排 LLM 调用** 上做深;本项目在 **如何让模型本身在金融领域更好用** 上做深 — 包括同时作证 prompt-only / SFT / DPO 谁带来多少边际价值,而不是把"调用 API 就完事"当成 baseline。
+
+## 金融场景设计决策
+
+每一个看起来"技术"的决策,背后都是一个金融场景的取舍:
+
+### 1. 为什么选 Qwen2.5 系列(中英双语 + 国产合规)?
+
+A 股研报、招股书、监管披露绝大多数是中文,但全球可比公司 / 上市的财报又以英文为主。需要一个 **同时把中文金融术语吃透、又能直接读 SEC 10-K 的 base 模型**。Qwen2.5-1.5B/7B-Instruct 是当前同尺寸下中英双语金融语料表现最稳的开源选项;同时国产模型在合规审查、内网部署、`safetensors` 完整可下载这些工程实操维度上比 Llama / Mistral 摩擦小一档。
+
+### 2. 为什么是这 4 个任务而不是泛化的"document QA"?
+
+`fin_summary` / `event_extraction` / `doc_qa` / `analysis_gen` 不是随便选的 — 它们对应了金融业务里 **真正在被人重复做、且可以被机器接管的那一拨工作**:研究员看一段研报先做要点摘要(fin_summary)、风控/合规扫公告抽出 (公司, 事件, 指标方向) 三元组(event_extraction)、PM 开会前对照招股书问问题(doc_qa)、分析师把数据点写成一段可读的备忘录段落(analysis_gen)。每个任务都有 **结构化、机器可校验的输出格式**,这才让 SFT / DPO / prompt-only 之间的对比是真有数字差,而不是各凭主观判断。
+
+### 3. 为什么用 grounding rate 而不只用 ROUGE?
+
+ROUGE 只能告诉你"输出和参考长得像",但金融场景里 **流畅但错的回答比直接说"找不到"危险得多** — 一个 hallucinated 的财报数字会被下游分析、写进备忘录、甚至发给客户。`grounding_rate`(`doc_qa` 的 `evidence_span` 是否在原文里出现)是直接量化"模型说的是不是有据可查",对应金融场景里"留痕 / 可审计"的合规要求。SFT 把它从 0.90 推到 1.00 不是好看的数字,是 **从'偶尔编一个'到'敢把答案给监管看'** 的差别。
+
+### 4. 为什么把 FinanceBench 单列出来当 OOD 外部基准?
+
+我们自己造的 400 条种子数据集,无论怎么 split,都跟 SFT 训练数据长得像。**没有外部 benchmark = 没有泛化证据**。FinanceBench 是公开的金融 10-K 上的 QA 集,跟我们种子数据完全异质 — 在它上面跑分,是检验 SFT/DPO 学到的是 "金融领域知识" 还是 "我们这 320 条 train 集的捷径"。这是把项目从"看上去能跑"推到"敢说在金融领域有泛化能力"的关键一道关。
+
+---
 
 ## Architecture
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                        Domain LLM Studio                               │
+│                        Domain LLM Studio (finance-focused)             │
 ├──────────────┬───────────────┬──────────────────┬─────────────────────┤
 │ Data Pipeline│ Training      │ Evaluation       │ Serving             │
 ├──────────────┼───────────────┼──────────────────┼─────────────────────┤
 │ Seed Gen     │ Qwen2.5 Base  │ Internal 4-task  │ FastAPI Server      │
-│ Cleaning     │ LoRA / QLoRA  │ External Bench   │ Gradio Demo         │
-│ Formatting   │ SFTTrainer    │ 3 variants eval  │ Model Compare       │
+│ Cleaning     │ LoRA / QLoRA  │ FinanceBench OOD │ Gradio Demo         │
+│ Formatting   │ + DPO post    │ 4 variants eval  │ vLLM (paged-attn)   │
 │ Splitting    │ Config-driven │ Charts & Reports │ Preset Examples     │
 └──────────────┴───────────────┴──────────────────┴─────────────────────┘
 ```
 
 ## Task Definitions
 
-The system targets four concrete, evaluatable tasks in **financial/enterprise document intelligence** (bilingual: Chinese + English):
+The system targets four concrete, evaluatable tasks in **金融文档智能** (bilingual: Chinese + English):
 
 ### Task 1: Financial Document Summarization (`fin_summary`)
 
@@ -559,16 +586,16 @@ domain-llm-studio inspect-results  Show latest evaluation summary
 
 This project demonstrates:
 
-- **Multi-scale domain LLM adaptation** — trained and evaluated both 1.5B (local, Apple M4) and 7B (cloud, RTX 5090) models with LoRA
-- **Six-variant evaluation matrix** (2 scales × 3 variants) — isolates the contribution of model scale, prompting, and fine-tuning
-- **Internal + external evaluation** — custom 4-task metric suite plus FinanceBench (150 real SEC filing questions) public benchmark
-- **Data quality engineering** — discovered and fixed a data generation bug causing 0.0 extraction F1, demonstrating systematic debugging
-- **Task-specific metrics** — custom evaluation beyond perplexity: entity F1, grounding rate, field completeness, key presence rate, partial field match
+- **金融领域 LLM 端到端适配** — 覆盖 4 项核心金融文档智能任务(摘要 / 事件抽取 / 文档 QA / 结构化分析),从数据构造一路打到 vLLM 服务化
+- **Multi-scale domain LLM adaptation** — trained and evaluated both 1.5B (local, Apple M4) and 7B (cloud, RTX 5090) with LoRA
+- **SFT + DPO 双阶段后训练** — SFT 把 fin_summary ROUGE-L 从 0.633 推到 0.917、event_f1 从 0.067 推到 0.400;在 SFT 顶上加 DPO,reward accuracy 0.82,完整跑通 197 偏好对的端到端 pipeline
+- **vLLM 推理后端 + 量化对照** — 在 RTX 5090 上对照 transformers vs vLLM:1.5B 吞吐 4.57x、P95 延迟 -75.9%;7B 吞吐 1.51x、P95 -26.8%;诚实交代单请求场景下 7B 加速空间小,batched 服务才是 vLLM 真正的舞台
+- **Eight-variant evaluation matrix** (2 scales × 4 variants: base / prompt-only / SFT / DPO) — 把 prompting / SFT / DPO 各自的边际价值都拆开来量化,而不是只跑一个 tuned vs base
+- **Internal + external evaluation** — custom 4-task metric suite plus FinanceBench (150 real SEC filing questions) as the OOD benchmark — 没有外部 OOD = 没有泛化证据
+- **Task-specific metrics** — custom evaluation beyond perplexity: entity F1, grounding rate, field completeness, key presence rate, partial field match — 都跟金融场景的合规 / 留痕需求直接挂钩
 - **Error analysis** — systematic classification of model failures (hallucination, grounding failure, format violation, partial match)
-- **Scale vs adaptation insights** — found that 1.5B tuned can outperform 7B tuned on certain metrics, demonstrating cost-efficient adaptation
-- **Parameter-efficient fine-tuning** — LoRA with config-driven experiment management, 1.18% params for 1.5B, 0.53% for 7B
-- **Reproducible pipeline** — Makefile, GitHub Actions CI, seed-deterministic data, YAML-configured experiments
-- **Full-stack ML** — data synthesis → training → evaluation → error analysis → API serving → web demo
+- **Reproducible pipeline** — Makefile (`make train-dpo-7b` / `make compare-7b-dpo` / `make benchmark-inference`), GitHub Actions CI, seed-deterministic data, YAML-configured experiments
+- **Full-stack ML** — data synthesis → training (SFT+DPO) → evaluation → error analysis → vLLM serving → Gradio demo
 
 ## License
 
