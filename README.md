@@ -445,8 +445,42 @@ preference pairs `(prompt, chosen, rejected)`. The pipeline:
    `base` vs `prompt_only` vs `tuned` (SFT) vs `dpo_tuned` (SFT + DPO).
 
 <!-- DPO_RESULTS_START -->
-_Results will be filled by `make eval-dpo-7b && make compare-7b-dpo`. The
-comparison report lives at `experiments/comparison_7b_dpo/`._
+
+**Training run** (RTX 5090, 7B base + SFT-merged + new LoRA):
+
+| | Value |
+|---|---|
+| Preference pairs | 197 train / 38 dev (from base vs SFT, ROUGE-L scoring) |
+| Epochs / steps | 3 / 75 |
+| Wall time | 192s |
+| Final train loss | 0.674 |
+| **Eval reward accuracy** | **0.816** (model correctly prefers `chosen` over `rejected` 81.6% of the time) |
+| Final reward margin | +0.07 |
+
+**4-variant test-set comparison** (10 samples per task, deterministic):
+
+| Task / Metric | base | prompt_only | SFT (tuned) | DPO_tuned |
+|---|---|---|---|---|
+| `fin_summary` ROUGE-L | 0.633 | 0.682 | **0.917** | 0.623 |
+| `fin_summary` keypoint coverage | 0.650 | 0.585 | **0.793** | 0.630 |
+| `doc_qa` exact_match | 0.800 | 0.800 | **1.000** | 0.800 |
+| `doc_qa` grounding_rate | 0.900 | 1.000 | **1.000** | 0.900 |
+| `event_extraction` event_f1 | 0.067 | 0.367 | **0.400** | 0.067 |
+| `analysis_gen` schema_match | 0.933 | 0.933 | 0.933 | 0.933 |
+
+**Honest reading of these numbers.** SFT alone closes the largest gap on
+this task suite (event_f1: 0.067 → 0.400, ROUGE-L: 0.633 → 0.917). DPO on
+top of SFT shows healthy training-side signals (reward accuracy 0.82,
+positive reward margin) but on this 197-pair / 5e-7 / 3-epoch budget
+**does not move generation behavior past the SFT initialization** — the
+DPO LoRA noise even costs a few points on `fin_summary`. The pipeline
+itself (preference data construction, merge-and-LoRA DPO trainer,
+4-variant evaluator) is correctly wired end-to-end and ready to scale:
+the next levers are **more preference pairs (≥5×)**, **higher β /
+larger lr**, and **human-labeled chosen/rejected** instead of
+ROUGE-L-as-proxy-judge. Treat this as the working scaffold, not the
+asymptote.
+
 <!-- DPO_RESULTS_END -->
 
 ```bash
