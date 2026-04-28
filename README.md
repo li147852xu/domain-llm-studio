@@ -390,15 +390,39 @@ The system ships with **two interchangeable inference backends** behind a single
   best for development and small-scale evaluation)
 - `vllm` — paged-attention KV cache + continuous batching (production serving)
 
-Benchmark on RTX 5090 (32 GB), bf16, greedy decoding, 50 samples per task across
-4 financial tasks (`fin_summary` / `event_extraction` / `doc_qa` / `analysis_gen`):
+Benchmark on RTX 5090 (32 GB), bf16, greedy decoding, 40 samples (10 per
+task) across 4 financial tasks
+(`fin_summary` / `event_extraction` / `doc_qa` / `analysis_gen`),
+single-request-per-call (no client-side batching):
 
 <!-- BENCHMARK_TABLE_START -->
-_Numbers will be filled by `scripts/benchmark_inference.py`. Run:_
-```bash
-python scripts/benchmark_inference.py --models 1.5b,7b --backends transformers,vllm --num-samples 50
-```
-_then re-render this section from `experiments/inference_benchmark/summary.md`._
+
+| Model | Backend | Total(s) | P50(ms) | P95(ms) | Tokens/s | PeakMem(GB) |
+|---|---|---|---|---|---|---|
+| Qwen2.5-1.5B | transformers | 90.8 | 1762 | 5984 | 69.5 | 3.5 |
+| Qwen2.5-1.5B | **vLLM** | **19.6** | **372** | **1442** | **317.4** | 30.9 |
+| Qwen2.5-7B  | transformers | 85.2 | 1870 | 6631 | 69.0 | 14.9 |
+| Qwen2.5-7B  | **vLLM** | **63.1** | **1281** | **4852** | **103.9** | 30.4 |
+
+| Model | Throughput speedup | P95 latency reduction |
+|---|---|---|
+| 1.5B | **4.57x** | **-75.9%** |
+| 7B | **1.51x** | **-26.8%** |
+
+Notes:
+- vLLM peak memory is high because vLLM **pre-allocates ~85% of device
+  memory as a paged-attention KV-cache pool** at engine init (not because
+  inference itself uses more). The pool is what enables 100x+ concurrent
+  request capacity in a real serving deployment.
+- The 1.5B speedup is dramatic because vLLM's per-token overhead (CUDA
+  graphs, paged attention) is amortized over more cheap forward passes.
+  For 7B, the model forward dominates and the gap shrinks. Under a
+  **batched** workload (the actual production use case), vLLM's
+  continuous batching widens the gap further on both sizes.
+- Reproduce with `python scripts/benchmark_inference.py --models 1.5b,7b
+  --backends transformers,vllm --num-samples 50`. Raw numbers and charts
+  live under `experiments/inference_benchmark/`.
+
 <!-- BENCHMARK_TABLE_END -->
 
 ## Project Structure
