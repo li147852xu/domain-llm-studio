@@ -1,0 +1,28 @@
+{
+  "base_model": "models/Qwen2.5-7B-Instruct",
+  "sft_adapter_path": "experiments/train/lora_7b/adapter",
+  "data_dir": "data/processed/preference",
+  "output_dir": "experiments/train/dpo_7b",
+  "lora": {
+    "r": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "target_modules": null,
+    "bias": "none",
+    "task_type": "CAUSAL_LM"
+  },
+  "beta": 0.1,
+  "learning_rate": 5e-07,
+  "num_epochs": 3,
+  "per_device_batch_size": 2,
+  "gradient_accumulation_steps": 4,
+  "warmup_ratio": 0.05,
+  "max_prompt_length": 1024,
+  "max_length": 1536,
+  "logging_steps": 5,
+  "eval_steps": 25,
+  "save_steps": 50,
+  "bf16": true,
+  "seed": 42,
+  "device_map": "auto"
+}
